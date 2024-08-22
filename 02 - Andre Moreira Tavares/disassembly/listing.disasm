@@ -1,0 +1,40 @@
+Disassembly Listing for PiscaLedSequencialAndre
+Generated From:
+C:/Users/André/OneDrive/Área de Trabalho/Engenharia/6 Período/Microprocessadores e Microcontroladores/Projetos/02 - Andre Moreira Tavares/dist/default/debug/02_-_Andre_Moreira_Tavares.debug.cof
+07/03/2024 21:33:42
+
+---  C:/Users/Andr?/OneDrive/?rea de Trabalho/Engenharia/6 Per?odo/Microprocessadores e Microcontroladores/Projetos/02 - Andre Moreira Tavares/newpic_8b_simple.asm
+0000  1683     BSF STATUS, 0x5
+0001  1006     BCF PORTB, 0x0
+0002  1086     BCF PORTB, 0x1
+0003  1106     BCF PORTB, 0x2
+0004  1186     BCF PORTB, 0x3
+0005  1283     BCF STATUS, 0x5
+0006  1006     BCF PORTB, 0x0
+0007  1086     BCF PORTB, 0x1
+0008  1106     BCF PORTB, 0x2
+0009  1186     BCF PORTB, 0x3
+000A  1C85     BTFSS PORTA, 0x1
+000B  280A     GOTO 0xA
+000C  1406     BSF PORTB, 0x0
+000D  1D05     BTFSS PORTA, 0x2
+000E  280D     GOTO 0xD
+000F  1486     BSF PORTB, 0x1
+0010  1D85     BTFSS PORTA, 0x3
+0011  2810     GOTO 0x10
+0012  1506     BSF PORTB, 0x2
+0013  1E05     BTFSS PORTA, 0x4
+0014  2813     GOTO 0x13
+0015  1586     BSF PORTB, 0x3
+0016  1C85     BTFSS PORTA, 0x1
+0017  2816     GOTO 0x16
+0018  1006     BCF PORTB, 0x0
+0019  1D05     BTFSS PORTA, 0x2
+001A  2819     GOTO 0x19
+001B  1086     BCF PORTB, 0x1
+001C  1D85     BTFSS PORTA, 0x3
+001D  281C     GOTO 0x1C
+001E  1106     BCF PORTB, 0x2
+001F  1E05     BTFSS PORTA, 0x4
+0020  281F     GOTO 0x1F
+0021  1186     BCF PORTB, 0x3

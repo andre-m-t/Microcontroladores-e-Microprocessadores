@@ -1,0 +1,50 @@
+MPLINK 5.08, LINKER
+Linker Map File - Created Sat Mar 23 23:08:18 2024
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                 RES_VECT       code   0x000000    program   0x000072
+                   .cinit    romdata   0x000039    program   0x000004
+.config_2007_BUILD/DEFAULT/PRODUCTION/NEWPIC_       code   0x002007    program   0x000002
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x00003a      
+                            0x002007    0x002007      
+            60 out of 2182 program addresses used, program memory utilization is 2%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+              B_2HZ_PRESS   0x000009    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\05 - Andre Moreira Tavares\newpic_8b_simple.asm
+              B_5HZ_PRESS   0x000010    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\05 - Andre Moreira Tavares\newpic_8b_simple.asm
+       DECREMENTA_DELAY_2   0x00001d    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\05 - Andre Moreira Tavares\newpic_8b_simple.asm
+      DECREMENTA_DELAY_2B   0x00002e    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\05 - Andre Moreira Tavares\newpic_8b_simple.asm
+                DELAY_2HZ   0x000017    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\05 - Andre Moreira Tavares\newpic_8b_simple.asm
+                DELAY_5HZ   0x000028    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\05 - Andre Moreira Tavares\newpic_8b_simple.asm
+         REINICIA_DELAY_2   0x00001b    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\05 - Andre Moreira Tavares\newpic_8b_simple.asm
+        REINICIA_DELAY_2B   0x00002c    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\05 - Andre Moreira Tavares\newpic_8b_simple.asm
+          VERIFICA_BOTOES   0x000004    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\05 - Andre Moreira Tavares\newpic_8b_simple.asm
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+          VERIFICA_BOTOES   0x000004    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\05 - Andre Moreira Tavares\newpic_8b_simple.asm
+              B_2HZ_PRESS   0x000009    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\05 - Andre Moreira Tavares\newpic_8b_simple.asm
+              B_5HZ_PRESS   0x000010    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\05 - Andre Moreira Tavares\newpic_8b_simple.asm
+                DELAY_2HZ   0x000017    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\05 - Andre Moreira Tavares\newpic_8b_simple.asm
+         REINICIA_DELAY_2   0x00001b    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\05 - Andre Moreira Tavares\newpic_8b_simple.asm
+       DECREMENTA_DELAY_2   0x00001d    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\05 - Andre Moreira Tavares\newpic_8b_simple.asm
+                DELAY_5HZ   0x000028    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\05 - Andre Moreira Tavares\newpic_8b_simple.asm
+        REINICIA_DELAY_2B   0x00002c    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\05 - Andre Moreira Tavares\newpic_8b_simple.asm
+      DECREMENTA_DELAY_2B   0x00002e    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\05 - Andre Moreira Tavares\newpic_8b_simple.asm
+
+

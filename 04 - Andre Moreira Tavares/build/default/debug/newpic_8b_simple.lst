@@ -1,0 +1,422 @@
+MPASM 5.71              NEWPIC_8B_SIMPLE.ASM   3-22-2024  11:09:10         PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00001 ;ANDRE MOREIRA TAVARES
+                      00002 #include "p16f628a.inc"
+                      00001         LIST
+                      00002 
+                      00003 ;==========================================================================
+                      00004 ; Build date : Nov 17 2016
+                      00005 ;  MPASM PIC16F628A processor include
+                      00006 ; 
+                      00007 ;  (c) Copyright 1999-2016 Microchip Technology, All rights reserved
+                      00008 ;==========================================================================
+                      00009 
+                      00386         LIST
+                      00003 ; CONFIG
+                      00004 ; __config 0xFF7B
+2007   3F70           00005  __CONFIG _FOSC_INTOSCIO & _WDTE_OFF & _PWRTE_ON & _MCLRE_ON & _BOREN_ON & _LVP_OFF & _CPD_OFF & _CP_OFF
+                      00006 ;nomeando posições da memória RAM
+Warning[205]: Found directive in column 1. (CBLOCK)
+                      00007 CBLOCK 0X20
+  00000020            00008     FLAGS       ;0x20
+  00000021            00009     UNIDADE     ;0x22
+  00000022            00010     F_UP        ;0x23
+  00000023            00011     F_DOWN      ;0x24
+                      00012  ENDC
+                      00013  ;entradas
+                      00014  #define    BOTAO_ZER           PORTA,1
+                      00015  #define    BOTAO_INC           PORTA,2
+                      00016  #define    BOTAO_DEC           PORTA,3
+                      00017  ;saidas
+                      00018  #define    NUMERO              PORTB
+                      00019  ;constantes
+                      00020  #define    JA_UP               FLAGS,0
+                      00021  #define    JA_DOWN             FLAGS,1
+                      00022  ;filtros
+Warning[207]: Found label after column 1. (FILTRO)
+  00000032            00023  FILTRO     equ                 .50             
+                      00024  ;========PROGRAMA==================
+                      00025 RES_VECT  CODE    0x0000            ; vetor de reset, indica a posição inicial do programa na FLASH
+0000   1683           00026     BSF     STATUS,RP0              ;selecionando o banco 1 da memória RAM
+0001   3000           00027     MOVLW   B'00000000'             ;W= B'11110000'(.240)
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0002   0086           00028     MOVWF   TRISB                   ;DEFININDO AS SAIDAS E ENTRADAS DO PORTB
+0003   1283           00029     BCF     STATUS,RP0              ;seleciona o banco 0 da memória RAM
+0004   01A1           00030     CLRF    UNIDADE                 ;LIMPA FLAG DE MEMORIA UNIDADE
+0005   1020           00031     BCF     JA_UP                   ;LIMPA BIT DE MEMORIA JA_UP
+0006   10A0           00032     BCF     JA_DOWN                 ;LIMPA BIT DE MEMORIA JA_DOWN
+0007   2???           00033     CALL    ESCREVE_DISPLAY         ;COMECA MOSTRANDO 0 NO DISPLAY
+                      00034     
+                      00035 
+0008                  00036 VERIFICAR_BOTAO_ZER
+0008   1C85           00037     BTFSS   BOTAO_ZER               ;LE E TESTA O BOTAO DE ZERAR
+0009   2???           00038     GOTO    ZERAR_PRESS             ;SE PRESSIONADO VAI PARA ZERAR_PRESS(0)
+000A                  00039 VERIFICAR_BOTAO_INC                     
+000A   1D05           00040     BTFSS   BOTAO_INC               ;LE E TESTA O BOTAO DE INCREMENTO
+MPASM 5.71              NEWPIC_8B_SIMPLE.ASM   3-22-2024  11:09:10         PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+000B   2???           00041     GOTO    INCREMENTAR             ;SE PRESSIONADO VAI PARA INCREMENTAR(0)
+000C   1020           00042     BCF     JA_UP                   ;CASO NAO FOI PRESSIONADO LIMPA JA_UP
+000D   3032           00043     MOVLW   FILTRO                  
+000E   00A2           00044     MOVWF   F_UP                    ;E REINICIA O FILTRO
+000F                  00045 VERIFICAR_BOTAO_DEC
+000F   1D85           00046     BTFSS   BOTAO_DEC               ;LE E TESTA O BOTAO DE DECREMENTO
+0010   2???           00047     GOTO    DECREMENTAR             ;VAI PARA DECREMENTAR CASO PRESSIONADO (0)
+0011   10A0           00048     BCF    JA_DOWN                  ;LIMPA JA_DOWN
+0012   3032           00049     MOVLW   FILTRO          
+0013   00A3           00050     MOVWF   F_DOWN                  ;REINICIA FILTRO
+0014   2???           00051     GOTO    VERIFICAR_BOTAO_ZER     ;VOLTA PARA O INICIO PARA MANTER O LOOP
+                      00052     
+                      00053     
+0015                  00054 INCREMENTAR
+0015   1820           00055     BTFSC   JA_UP                   ;TESTA SE JA SUBIU
+0016   2???           00056     GOTO    VERIFICAR_BOTAO_DEC     ;SE SIM VOLTA PRO LOOP PRINCIPAL
+0017   0BA2           00057     DECFSZ  F_UP,F                  ;CASO NAO DECREMENTA O FILTRO E SKIP SE FOR 0
+0018   2???           00058     GOTO    VERIFICAR_BOTAO_DEC     ;PARA EVITAR O DEBOUNCE, E AQUI VOLTA PARA O LOOP PRINCIPAL PARA MAN
+                            TER PRIORIDADE DO BOTAO ZERAR
+0019   1420           00059     BSF     JA_UP                   ;SETA QUE JA INCREMENTOU
+001A   0AA1           00060     INCF    UNIDADE,F               ;INCREMENTA UNIDADE
+001B   300A           00061     MOVLW   .10                     ;W=10
+001C   0221           00062     SUBWF   UNIDADE,W               ;SUBTRAI W DE UNIDADE ( R = UNIDADE - W)
+001D   1803           00063     BTFSC   STATUS,C                ;TESTA SE HOUVE CARRY ( GEROU NUMERO NEGATIVO)
+001E   01A1           00064     CLRF    UNIDADE                 ;SE SIM LIMPA UNIDADE (RESETA)
+001F   0821           00065     MOVF    UNIDADE,W               ;W=UNIDADE PARA CHAMAR FUNCAO
+0020   2???           00066     CALL    ESCREVE_DISPLAY         ;ESCREVE NO DISPLAY
+0021   2???           00067     GOTO    VERIFICAR_BOTAO_DEC     ;VOLTA PARA O LOOP CONTINUANDO O PROGRAMA
+                      00068     
+0022                  00069 DECREMENTAR
+0022   18A0           00070     BTFSC   JA_DOWN
+0023   2???           00071     GOTO    VERIFICAR_BOTAO_ZER
+0024   0BA3           00072     DECFSZ  F_DOWN,F
+0025   2???           00073     GOTO    VERIFICAR_BOTAO_ZER
+0026   14A0           00074     BSF     JA_DOWN
+0027   3001           00075     MOVLW   .1                       ;W = 1
+0028   0221           00076     SUBWF   UNIDADE,W               ;DECREMENTANDO 1 DE UNIDADE, MANUALMENTE(R = UNIDADE - W)
+0029   1803           00077     BTFSC   STATUS,C                ;TESTA SE HOUVE CARRY
+002A   2???           00078     GOTO    DECREMENTA_UNIDADE      ;SE FOR MAIOR QUE 0 MOSTRA O VALOR QUE TEM
+002B   3009           00079     MOVLW   .9                      ;RESETANDO A UNIDADE COM 9
+002C   00A1           00080     MOVWF   UNIDADE
+002D   2???           00081     GOTO    CONTINUA                ;VAI PARA MOSTRAR2 PARA PULAR O PASSO ABAIXO
+002E                  00082 DECREMENTA_UNIDADE
+002E   00A1           00083     MOVWF   UNIDADE                 ;GUARDANDO O DECREMENTO EM UNIDADE
+002F                  00084 CONTINUA    
+002F   0821           00085     MOVF    UNIDADE,W               ;GUARDA VALOR DE UNIDADE EM W PARA CHAMAR O ESCREVE
+0030   2???           00086     CALL    ESCREVE_DISPLAY         ;ESCREVE NO DISPLAY
+0031   2???           00087     GOTO    VERIFICAR_BOTAO_ZER     ;VOLTA PARA O INICIO DO LOOP
+                      00088        
+0032                  00089 ZERAR_PRESS
+0032   01A1           00090     CLRF    UNIDADE                 ;LIMPAR UNIDADE
+0033   0180           00091     CLRF    W                       ;LIMPAR W, POR GARANTIA
+0034   2???           00092     CALL    ESCREVE_DISPLAY         ;CHAMA ESCREVE DISPLAY
+MPASM 5.71              NEWPIC_8B_SIMPLE.ASM   3-22-2024  11:09:10         PAGE  3
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0035   2???           00093     GOTO    VERIFICAR_BOTAO_ZER     ;RETORNA AO LACO PRINCIPAL
+                      00094     
+0036                  00095 ESCREVE_DISPLAY
+0036   2???           00096     CALL    BUSCA_CODIGO            ;CHAMA SUBROTINA PARA BUSCAR O CODIGO DE 7 SEGMENTOS
+0037   0086           00097     MOVWF   NUMERO                  ;NUEMERO = W (CODIGO DE 7 SEGUIMENTOS)
+0038   0008           00098     RETURN                          ;RETORNA DA CHAMADA DE SUBROTINA
+                      00099     
+0039                  00100 BUSCA_CODIGO
+0039   0782           00101     ADDWF   PCL,F
+003A   34FE           00102     RETLW   .254                    ;0
+003B   3438           00103     RETLW   .56                     ;1
+003C   34DD           00104     RETLW   .221                    ;2
+003D   347D           00105     RETLW   .125                    ;3
+003E   343B           00106     RETLW   .59                     ;4
+003F   3477           00107     RETLW   .119                    ;5
+0040   34F7           00108     RETLW   .247                    ;6
+0041   343C           00109     RETLW   .60                     ;7
+0042   34FF           00110     RETLW   .255                    ;8
+0043   347F           00111     RETLW   .127                    ;9
+                      00112     
+                      00113     
+3F70                  00114     END
+MPASM 5.71              NEWPIC_8B_SIMPLE.ASM   3-22-2024  11:09:10         PAGE  4
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+ADDEN                             00000003
+ADEN                              00000003
+BOTAO_DEC                         PORTA,3
+BOTAO_INC                         PORTA,2
+BOTAO_ZER                         PORTA,1
+BRGH                              00000002
+BUSCA_CODIGO                      00000039
+C                                 00000000
+C1INV                             00000004
+C1OUT                             00000006
+C2INV                             00000005
+C2OUT                             00000007
+CCP1CON                           00000017
+CCP1IE                            00000002
+CCP1IF                            00000002
+CCP1M0                            00000000
+CCP1M1                            00000001
+CCP1M2                            00000002
+CCP1M3                            00000003
+CCP1X                             00000005
+CCP1Y                             00000004
+CCPR1                             00000015
+CCPR1H                            00000016
+CCPR1L                            00000015
+CIS                               00000003
+CM0                               00000000
+CM1                               00000001
+CM2                               00000002
+CMCON                             0000001F
+CMIE                              00000006
+CMIF                              00000006
+CONTINUA                          0000002F
+CREN                              00000004
+CSRC                              00000007
+DATA_CP_OFF                       00003FFF
+DATA_CP_ON                        00003EFF
+DC                                00000001
+DECREMENTAR                       00000022
+DECREMENTA_UNIDADE                0000002E
+EEADR                             0000009B
+EECON1                            0000009C
+EECON2                            0000009D
+EEDATA                            0000009A
+EEIE                              00000007
+EEIF                              00000007
+ESCREVE_DISPLAY                   00000036
+F                                 00000001
+FERR                              00000002
+FILTRO                            00000032
+FLAGS                             00000020
+FSR                               00000004
+F_DOWN                            00000023
+F_UP                              00000022
+MPASM 5.71              NEWPIC_8B_SIMPLE.ASM   3-22-2024  11:09:10         PAGE  5
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+GIE                               00000007
+INCREMENTAR                       00000015
+INDF                              00000000
+INTCON                            0000000B
+INTE                              00000004
+INTEDG                            00000006
+INTF                              00000001
+IRP                               00000007
+JA_DOWN                           FLAGS,1
+JA_UP                             FLAGS,0
+NOT_BO                            00000000
+NOT_BOD                           00000000
+NOT_BOR                           00000000
+NOT_PD                            00000003
+NOT_POR                           00000001
+NOT_RBPU                          00000007
+NOT_T1SYNC                        00000002
+NOT_TO                            00000004
+NUMERO                            PORTB
+OERR                              00000001
+OPTION_REG                        00000081
+OSCF                              00000003
+PCL                               00000002
+PCLATH                            0000000A
+PCON                              0000008E
+PEIE                              00000006
+PIE1                              0000008C
+PIR1                              0000000C
+PORTA                             00000005
+PORTB                             00000006
+PR2                               00000092
+PS0                               00000000
+PS1                               00000001
+PS2                               00000002
+PSA                               00000003
+RA0                               00000000
+RA1                               00000001
+RA2                               00000002
+RA3                               00000003
+RA4                               00000004
+RA5                               00000005
+RA6                               00000006
+RA7                               00000007
+RB0                               00000000
+RB1                               00000001
+RB2                               00000002
+RB3                               00000003
+RB4                               00000004
+RB5                               00000005
+RB6                               00000006
+RB7                               00000007
+RBIE                              00000003
+RBIF                              00000000
+MPASM 5.71              NEWPIC_8B_SIMPLE.ASM   3-22-2024  11:09:10         PAGE  6
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+RCIE                              00000005
+RCIF                              00000005
+RCREG                             0000001A
+RCSTA                             00000018
+RD                                00000000
+RP0                               00000005
+RP1                               00000006
+RX9                               00000006
+RX9D                              00000000
+SPBRG                             00000099
+SPEN                              00000007
+SREN                              00000005
+STATUS                            00000003
+SYNC                              00000004
+T0CS                              00000005
+T0IE                              00000005
+T0IF                              00000002
+T0SE                              00000004
+T1CKPS0                           00000004
+T1CKPS1                           00000005
+T1CON                             00000010
+T1OSCEN                           00000003
+T2CKPS0                           00000000
+T2CKPS1                           00000001
+T2CON                             00000012
+TMR0                              00000001
+TMR0IE                            00000005
+TMR0IF                            00000002
+TMR1                              0000000E
+TMR1CS                            00000001
+TMR1H                             0000000F
+TMR1IE                            00000000
+TMR1IF                            00000000
+TMR1L                             0000000E
+TMR1ON                            00000000
+TMR2                              00000011
+TMR2IE                            00000001
+TMR2IF                            00000001
+TMR2ON                            00000002
+TOUTPS0                           00000003
+TOUTPS1                           00000004
+TOUTPS2                           00000005
+TOUTPS3                           00000006
+TRISA                             00000085
+TRISA0                            00000000
+TRISA1                            00000001
+TRISA2                            00000002
+TRISA3                            00000003
+TRISA4                            00000004
+TRISA5                            00000005
+TRISA6                            00000006
+TRISA7                            00000007
+TRISB                             00000086
+MPASM 5.71              NEWPIC_8B_SIMPLE.ASM   3-22-2024  11:09:10         PAGE  7
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+TRISB0                            00000000
+TRISB1                            00000001
+TRISB2                            00000002
+TRISB3                            00000003
+TRISB4                            00000004
+TRISB5                            00000005
+TRISB6                            00000006
+TRISB7                            00000007
+TRMT                              00000001
+TX9                               00000006
+TX9D                              00000000
+TXEN                              00000005
+TXIE                              00000004
+TXIF                              00000004
+TXREG                             00000019
+TXSTA                             00000098
+UNIDADE                           00000021
+VERIFICAR_BOTAO_DEC               0000000F
+VERIFICAR_BOTAO_INC               0000000A
+VERIFICAR_BOTAO_ZER               00000008
+VR0                               00000000
+VR1                               00000001
+VR2                               00000002
+VR3                               00000003
+VRCON                             0000009F
+VREN                              00000007
+VROE                              00000006
+VRR                               00000005
+W                                 00000000
+WR                                00000001
+WREN                              00000002
+WRERR                             00000003
+Z                                 00000002
+ZERAR_PRESS                       00000032
+_BODEN_OFF                        00003FBF
+_BODEN_ON                         00003FFF
+_BOREN_OFF                        00003FBF
+_BOREN_ON                         00003FFF
+_CONFIG                           00002007
+_CPD_OFF                          00003FFF
+_CPD_ON                           00003EFF
+_CP_OFF                           00003FFF
+_CP_ON                            00001FFF
+_DEVID1                           00002006
+_ER_OSC_CLKOUT                    00003FFF
+_ER_OSC_NOCLKOUT                  00003FFE
+_EXTCLK_OSC                       00003FEF
+_FOSC_ECIO                        00003FEF
+_FOSC_EXTRCCLK                    00003FFF
+_FOSC_EXTRCIO                     00003FFE
+_FOSC_HS                          00003FEE
+_FOSC_INTOSCCLK                   00003FFD
+_FOSC_INTOSCIO                    00003FFC
+MPASM 5.71              NEWPIC_8B_SIMPLE.ASM   3-22-2024  11:09:10         PAGE  8
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_FOSC_LP                          00003FEC
+_FOSC_XT                          00003FED
+_HS_OSC                           00003FEE
+_IDLOC0                           00002000
+_IDLOC1                           00002001
+_IDLOC2                           00002002
+_IDLOC3                           00002003
+_INTOSC_OSC_CLKOUT                00003FFD
+_INTOSC_OSC_NOCLKOUT              00003FFC
+_INTRC_OSC_CLKOUT                 00003FFD
+_INTRC_OSC_NOCLKOUT               00003FFC
+_LP_OSC                           00003FEC
+_LVP_OFF                          00003F7F
+_LVP_ON                           00003FFF
+_MCLRE_OFF                        00003FDF
+_MCLRE_ON                         00003FFF
+_PWRTE_OFF                        00003FFF
+_PWRTE_ON                         00003FF7
+_RC_OSC_CLKOUT                    00003FFF
+_RC_OSC_NOCLKOUT                  00003FFE
+_WDTE_OFF                         00003FFB
+_WDTE_ON                          00003FFF
+_WDT_OFF                          00003FFB
+_WDT_ON                           00003FFF
+_XT_OSC                           00003FED
+__16F628A                         00000001
+__DEBUG                           
+__MPLAB_DEBUGGER_SIMULATOR        1
+
+Errors   :     0
+Warnings :     2 reported,     0 suppressed
+Messages :     1 reported,     0 suppressed
+
+

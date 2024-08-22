@@ -1,0 +1,342 @@
+MPASM 5.71              NEWPIC_8B_SIMPLE.ASM   3-8-2024  16:21:38         PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00001 #include "p16f628a.inc"
+                      00001         LIST
+                      00002 
+                      00003 ;==========================================================================
+                      00004 ; Build date : Nov 17 2016
+                      00005 ;  MPASM PIC16F628A processor include
+                      00006 ; 
+                      00007 ;  (c) Copyright 1999-2016 Microchip Technology, All rights reserved
+                      00008 ;==========================================================================
+                      00009 
+                      00386         LIST
+                      00002 ;ANDRÉ MOREIRA TAVARES
+                      00003 ; CONFIG
+Warning[205]: Found directive in column 1. (__CONFIG)
+2007   3F70           00004 __CONFIG _FOSC_INTOSCIO & _WDTE_OFF & _PWRTE_ON & _MCLRE_ON & _BOREN_ON & _LVP_OFF & _CPD_OFF & _CP_OFF
+                      00005  
+                      00006 RES_VECT CODE 0x0000 ; VETOR DE RESET, INDICA A POSI  O INICIAL DO PROGRAMA NA FLASH
+0000   1683           00007     BSF STATUS,RP0  ;ENTRANDO NO BANCO 1
+0001   30F0           00008     MOVLW   B'11110000'             ;W= B'11110000'(.240)
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0002   0086           00009     MOVWF   TRISB                   ;DEFININDO AS SAIDAS E ENTRADAS DO PORTB
+0003   1283           00010     BCF STATUS,RP0  ;VOLTANDO AO BANCO 0
+0004   1006           00011     BCF PORTB,0     ;APAGANDO A LAMPADA
+0005   1086           00012     BCF PORTB,1
+0006   1106           00013     BCF PORTB,2
+0007   1186           00014     BCF PORTB,3
+                      00015  
+0008                  00016 LE_BOTAO1
+0008   1885           00017     BTFSC   PORTA,1                 ;lê e testa o bit 1 da PORT A1
+0009   2???           00018     GOTO    LE_BOTAO1               ;se não for zero, pula para LE_BOTAO1
+000A   1806           00019     BTFSC   PORTB,0                 ;testa o bit da saida B0
+000B   2???           00020     GOTO    APAGA_B0                ;se estiver desligada apaga
+000C   1406           00021     BSF     PORTB,0                 ;se estiver desligada acende
+000D   2???           00022     GOTO    LE_BOTAO2               ;pula para LE_BOTAO2 para que nao apague na sequencia do codigo
+000E                  00023 APAGA_B0
+000E   1006           00024     BCF     PORTB,0                 ;apaga led b0 e segue o codigo 
+                      00025     
+000F                  00026 LE_BOTAO2                           ;daqui por diante, repete-se os passos anteriores para os botoes e l
+                            ampadas consecutivos
+000F   1905           00027     BTFSC   PORTA,2                 
+0010   2???           00028     GOTO    LE_BOTAO2               
+0011   1886           00029     BTFSC   PORTB,1
+0012   2???           00030     GOTO    APAGA_B1
+0013   1486           00031     BSF     PORTB,1
+0014   2???           00032     GOTO    LE_BOTAO3
+0015                  00033 APAGA_B1
+0015   1086           00034     BCF     PORTB,1
+                      00035     
+0016                  00036 LE_BOTAO3
+0016   1985           00037     BTFSC   PORTA,3                 
+0017   2???           00038     GOTO    LE_BOTAO3              
+0018   1906           00039     BTFSC   PORTB,2
+0019   2???           00040     GOTO    APAGA_B2
+MPASM 5.71              NEWPIC_8B_SIMPLE.ASM   3-8-2024  16:21:38         PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+001A   1506           00041     BSF     PORTB,2                 
+001B   2???           00042     GOTO    LE_BOTAO4
+001C                  00043 APAGA_B2
+001C   1106           00044     BCF     PORTB,2
+001D                  00045 LE_BOTAO4
+001D   1A05           00046     BTFSC   PORTA,4                 
+001E   2???           00047     GOTO    LE_BOTAO4              
+001F   1986           00048     BTFSC   PORTB,3
+0020   2???           00049     GOTO    APAGA_B3
+0021   1586           00050     BSF     PORTB,3                 
+0022   2???           00051     GOTO    LE_BOTAO1               
+0023                  00052 APAGA_B3
+0023   1186           00053     BCF     PORTB,3
+0024   2???           00054     GOTO    LE_BOTAO1
+Warning[205]: Found directive in column 1. (END)
+3F70                  00055 END
+MPASM 5.71              NEWPIC_8B_SIMPLE.ASM   3-8-2024  16:21:38         PAGE  3
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+ADDEN                             00000003
+ADEN                              00000003
+APAGA_B0                          0000000E
+APAGA_B1                          00000015
+APAGA_B2                          0000001C
+APAGA_B3                          00000023
+BRGH                              00000002
+C                                 00000000
+C1INV                             00000004
+C1OUT                             00000006
+C2INV                             00000005
+C2OUT                             00000007
+CCP1CON                           00000017
+CCP1IE                            00000002
+CCP1IF                            00000002
+CCP1M0                            00000000
+CCP1M1                            00000001
+CCP1M2                            00000002
+CCP1M3                            00000003
+CCP1X                             00000005
+CCP1Y                             00000004
+CCPR1                             00000015
+CCPR1H                            00000016
+CCPR1L                            00000015
+CIS                               00000003
+CM0                               00000000
+CM1                               00000001
+CM2                               00000002
+CMCON                             0000001F
+CMIE                              00000006
+CMIF                              00000006
+CREN                              00000004
+CSRC                              00000007
+DATA_CP_OFF                       00003FFF
+DATA_CP_ON                        00003EFF
+DC                                00000001
+EEADR                             0000009B
+EECON1                            0000009C
+EECON2                            0000009D
+EEDATA                            0000009A
+EEIE                              00000007
+EEIF                              00000007
+F                                 00000001
+FERR                              00000002
+FSR                               00000004
+GIE                               00000007
+INDF                              00000000
+INTCON                            0000000B
+INTE                              00000004
+INTEDG                            00000006
+INTF                              00000001
+IRP                               00000007
+LE_BOTAO1                         00000008
+MPASM 5.71              NEWPIC_8B_SIMPLE.ASM   3-8-2024  16:21:38         PAGE  4
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+LE_BOTAO2                         0000000F
+LE_BOTAO3                         00000016
+LE_BOTAO4                         0000001D
+NOT_BO                            00000000
+NOT_BOD                           00000000
+NOT_BOR                           00000000
+NOT_PD                            00000003
+NOT_POR                           00000001
+NOT_RBPU                          00000007
+NOT_T1SYNC                        00000002
+NOT_TO                            00000004
+OERR                              00000001
+OPTION_REG                        00000081
+OSCF                              00000003
+PCL                               00000002
+PCLATH                            0000000A
+PCON                              0000008E
+PEIE                              00000006
+PIE1                              0000008C
+PIR1                              0000000C
+PORTA                             00000005
+PORTB                             00000006
+PR2                               00000092
+PS0                               00000000
+PS1                               00000001
+PS2                               00000002
+PSA                               00000003
+RA0                               00000000
+RA1                               00000001
+RA2                               00000002
+RA3                               00000003
+RA4                               00000004
+RA5                               00000005
+RA6                               00000006
+RA7                               00000007
+RB0                               00000000
+RB1                               00000001
+RB2                               00000002
+RB3                               00000003
+RB4                               00000004
+RB5                               00000005
+RB6                               00000006
+RB7                               00000007
+RBIE                              00000003
+RBIF                              00000000
+RCIE                              00000005
+RCIF                              00000005
+RCREG                             0000001A
+RCSTA                             00000018
+RD                                00000000
+RP0                               00000005
+RP1                               00000006
+RX9                               00000006
+MPASM 5.71              NEWPIC_8B_SIMPLE.ASM   3-8-2024  16:21:38         PAGE  5
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+RX9D                              00000000
+SPBRG                             00000099
+SPEN                              00000007
+SREN                              00000005
+STATUS                            00000003
+SYNC                              00000004
+T0CS                              00000005
+T0IE                              00000005
+T0IF                              00000002
+T0SE                              00000004
+T1CKPS0                           00000004
+T1CKPS1                           00000005
+T1CON                             00000010
+T1OSCEN                           00000003
+T2CKPS0                           00000000
+T2CKPS1                           00000001
+T2CON                             00000012
+TMR0                              00000001
+TMR0IE                            00000005
+TMR0IF                            00000002
+TMR1                              0000000E
+TMR1CS                            00000001
+TMR1H                             0000000F
+TMR1IE                            00000000
+TMR1IF                            00000000
+TMR1L                             0000000E
+TMR1ON                            00000000
+TMR2                              00000011
+TMR2IE                            00000001
+TMR2IF                            00000001
+TMR2ON                            00000002
+TOUTPS0                           00000003
+TOUTPS1                           00000004
+TOUTPS2                           00000005
+TOUTPS3                           00000006
+TRISA                             00000085
+TRISA0                            00000000
+TRISA1                            00000001
+TRISA2                            00000002
+TRISA3                            00000003
+TRISA4                            00000004
+TRISA5                            00000005
+TRISA6                            00000006
+TRISA7                            00000007
+TRISB                             00000086
+TRISB0                            00000000
+TRISB1                            00000001
+TRISB2                            00000002
+TRISB3                            00000003
+TRISB4                            00000004
+TRISB5                            00000005
+TRISB6                            00000006
+TRISB7                            00000007
+MPASM 5.71              NEWPIC_8B_SIMPLE.ASM   3-8-2024  16:21:38         PAGE  6
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+TRMT                              00000001
+TX9                               00000006
+TX9D                              00000000
+TXEN                              00000005
+TXIE                              00000004
+TXIF                              00000004
+TXREG                             00000019
+TXSTA                             00000098
+VR0                               00000000
+VR1                               00000001
+VR2                               00000002
+VR3                               00000003
+VRCON                             0000009F
+VREN                              00000007
+VROE                              00000006
+VRR                               00000005
+W                                 00000000
+WR                                00000001
+WREN                              00000002
+WRERR                             00000003
+Z                                 00000002
+_BODEN_OFF                        00003FBF
+_BODEN_ON                         00003FFF
+_BOREN_OFF                        00003FBF
+_BOREN_ON                         00003FFF
+_CONFIG                           00002007
+_CPD_OFF                          00003FFF
+_CPD_ON                           00003EFF
+_CP_OFF                           00003FFF
+_CP_ON                            00001FFF
+_DEVID1                           00002006
+_ER_OSC_CLKOUT                    00003FFF
+_ER_OSC_NOCLKOUT                  00003FFE
+_EXTCLK_OSC                       00003FEF
+_FOSC_ECIO                        00003FEF
+_FOSC_EXTRCCLK                    00003FFF
+_FOSC_EXTRCIO                     00003FFE
+_FOSC_HS                          00003FEE
+_FOSC_INTOSCCLK                   00003FFD
+_FOSC_INTOSCIO                    00003FFC
+_FOSC_LP                          00003FEC
+_FOSC_XT                          00003FED
+_HS_OSC                           00003FEE
+_IDLOC0                           00002000
+_IDLOC1                           00002001
+_IDLOC2                           00002002
+_IDLOC3                           00002003
+_INTOSC_OSC_CLKOUT                00003FFD
+_INTOSC_OSC_NOCLKOUT              00003FFC
+_INTRC_OSC_CLKOUT                 00003FFD
+_INTRC_OSC_NOCLKOUT               00003FFC
+_LP_OSC                           00003FEC
+_LVP_OFF                          00003F7F
+MPASM 5.71              NEWPIC_8B_SIMPLE.ASM   3-8-2024  16:21:38         PAGE  7
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_LVP_ON                           00003FFF
+_MCLRE_OFF                        00003FDF
+_MCLRE_ON                         00003FFF
+_PWRTE_OFF                        00003FFF
+_PWRTE_ON                         00003FF7
+_RC_OSC_CLKOUT                    00003FFF
+_RC_OSC_NOCLKOUT                  00003FFE
+_WDTE_OFF                         00003FFB
+_WDTE_ON                          00003FFF
+_WDT_OFF                          00003FFB
+_WDT_ON                           00003FFF
+_XT_OSC                           00003FED
+__16F628A                         00000001
+
+Errors   :     0
+Warnings :     2 reported,     0 suppressed
+Messages :     1 reported,     0 suppressed
+
+

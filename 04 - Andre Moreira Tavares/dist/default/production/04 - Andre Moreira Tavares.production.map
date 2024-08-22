@@ -1,0 +1,52 @@
+MPLINK 5.08, LINKER
+Linker Map File - Created Wed Mar 20 18:01:23 2024
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                 RES_VECT       code   0x000000    program   0x000088
+                   .cinit    romdata   0x000044    program   0x000004
+.config_2007_BUILD/DEFAULT/PRODUCTION/NEWPIC_       code   0x002007    program   0x000002
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x000045      
+                            0x002007    0x002007      
+            71 out of 2182 program addresses used, program memory utilization is 3%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+             BUSCA_CODIGO   0x000039    program     static C:\Users\André\OneDrive\Área de Trabalho\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\04 - Andre Moreira Tavares\newpic_8b_simple.asm
+                 CONTINUA   0x00002f    program     static C:\Users\André\OneDrive\Área de Trabalho\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\04 - Andre Moreira Tavares\newpic_8b_simple.asm
+              DECREMENTAR   0x000022    program     static C:\Users\André\OneDrive\Área de Trabalho\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\04 - Andre Moreira Tavares\newpic_8b_simple.asm
+       DECREMENTA_UNIDADE   0x00002e    program     static C:\Users\André\OneDrive\Área de Trabalho\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\04 - Andre Moreira Tavares\newpic_8b_simple.asm
+          ESCREVE_DISPLAY   0x000036    program     static C:\Users\André\OneDrive\Área de Trabalho\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\04 - Andre Moreira Tavares\newpic_8b_simple.asm
+              INCREMENTAR   0x000015    program     static C:\Users\André\OneDrive\Área de Trabalho\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\04 - Andre Moreira Tavares\newpic_8b_simple.asm
+      VERIFICAR_BOTAO_DEC   0x00000f    program     static C:\Users\André\OneDrive\Área de Trabalho\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\04 - Andre Moreira Tavares\newpic_8b_simple.asm
+      VERIFICAR_BOTAO_INC   0x00000a    program     static C:\Users\André\OneDrive\Área de Trabalho\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\04 - Andre Moreira Tavares\newpic_8b_simple.asm
+      VERIFICAR_BOTAO_ZER   0x000008    program     static C:\Users\André\OneDrive\Área de Trabalho\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\04 - Andre Moreira Tavares\newpic_8b_simple.asm
+              ZERAR_PRESS   0x000032    program     static C:\Users\André\OneDrive\Área de Trabalho\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\04 - Andre Moreira Tavares\newpic_8b_simple.asm
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+      VERIFICAR_BOTAO_ZER   0x000008    program     static C:\Users\André\OneDrive\Área de Trabalho\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\04 - Andre Moreira Tavares\newpic_8b_simple.asm
+      VERIFICAR_BOTAO_INC   0x00000a    program     static C:\Users\André\OneDrive\Área de Trabalho\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\04 - Andre Moreira Tavares\newpic_8b_simple.asm
+      VERIFICAR_BOTAO_DEC   0x00000f    program     static C:\Users\André\OneDrive\Área de Trabalho\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\04 - Andre Moreira Tavares\newpic_8b_simple.asm
+              INCREMENTAR   0x000015    program     static C:\Users\André\OneDrive\Área de Trabalho\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\04 - Andre Moreira Tavares\newpic_8b_simple.asm
+              DECREMENTAR   0x000022    program     static C:\Users\André\OneDrive\Área de Trabalho\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\04 - Andre Moreira Tavares\newpic_8b_simple.asm
+       DECREMENTA_UNIDADE   0x00002e    program     static C:\Users\André\OneDrive\Área de Trabalho\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\04 - Andre Moreira Tavares\newpic_8b_simple.asm
+                 CONTINUA   0x00002f    program     static C:\Users\André\OneDrive\Área de Trabalho\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\04 - Andre Moreira Tavares\newpic_8b_simple.asm
+              ZERAR_PRESS   0x000032    program     static C:\Users\André\OneDrive\Área de Trabalho\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\04 - Andre Moreira Tavares\newpic_8b_simple.asm
+          ESCREVE_DISPLAY   0x000036    program     static C:\Users\André\OneDrive\Área de Trabalho\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\04 - Andre Moreira Tavares\newpic_8b_simple.asm
+             BUSCA_CODIGO   0x000039    program     static C:\Users\André\OneDrive\Área de Trabalho\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\04 - Andre Moreira Tavares\newpic_8b_simple.asm
+
+

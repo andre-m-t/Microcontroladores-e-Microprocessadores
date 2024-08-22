@@ -1,0 +1,66 @@
+MPLINK 5.08, LINKER
+Linker Map File - Created Thu Apr 18 21:11:39 2024
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                 RES_VECT       code   0x000000    program   0x000002
+                   .cinit    romdata   0x000001    program   0x000004
+                      ISR       code   0x000004    program   0x00011e
+.config_2007_BUILD/DEFAULT/PRODUCTION/NEWPIC_       code   0x002007    program   0x000002
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x000002      
+                            0x000004    0x000092      
+                            0x002007    0x002007      
+            147 out of 8454 program addresses used, program memory utilization is 1%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+           ACENDE_CENTENA   0x00007f    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\07 - Andre Moreira Tavares\newpic_8b_simple.asm
+            ACENDE_DEZENA   0x000074    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\07 - Andre Moreira Tavares\newpic_8b_simple.asm
+               ACENDE_LED   0x000070    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\07 - Andre Moreira Tavares\newpic_8b_simple.asm
+            ACENDE_MILHAR   0x000087    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\07 - Andre Moreira Tavares\newpic_8b_simple.asm
+             BUSCA_CODIGO   0x00001b    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\07 - Andre Moreira Tavares\newpic_8b_simple.asm
+          B_INICIAR_PRESS   0x000065    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\07 - Andre Moreira Tavares\newpic_8b_simple.asm
+            B_PARAR_PRESS   0x00005a    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\07 - Andre Moreira Tavares\newpic_8b_simple.asm
+                   INICIO   0x000026    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\07 - Andre Moreira Tavares\newpic_8b_simple.asm
+           LACO_PRINCIPAL   0x000037    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\07 - Andre Moreira Tavares\newpic_8b_simple.asm
+                   PARADO   0x00005c    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\07 - Andre Moreira Tavares\newpic_8b_simple.asm
+          SAI_INTERRUPCAO   0x000017    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\07 - Andre Moreira Tavares\newpic_8b_simple.asm
+            TESTA_CENTENA   0x000085    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\07 - Andre Moreira Tavares\newpic_8b_simple.asm
+             TESTA_DEZENA   0x00007d    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\07 - Andre Moreira Tavares\newpic_8b_simple.asm
+             TESTA_MILHAR   0x00008d    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\07 - Andre Moreira Tavares\newpic_8b_simple.asm
+            TROCA_DISPLAY   0x000071    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\07 - Andre Moreira Tavares\newpic_8b_simple.asm
+                TROCA_LED   0x00006d    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\07 - Andre Moreira Tavares\newpic_8b_simple.asm
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+          SAI_INTERRUPCAO   0x000017    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\07 - Andre Moreira Tavares\newpic_8b_simple.asm
+             BUSCA_CODIGO   0x00001b    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\07 - Andre Moreira Tavares\newpic_8b_simple.asm
+                   INICIO   0x000026    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\07 - Andre Moreira Tavares\newpic_8b_simple.asm
+           LACO_PRINCIPAL   0x000037    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\07 - Andre Moreira Tavares\newpic_8b_simple.asm
+            B_PARAR_PRESS   0x00005a    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\07 - Andre Moreira Tavares\newpic_8b_simple.asm
+                   PARADO   0x00005c    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\07 - Andre Moreira Tavares\newpic_8b_simple.asm
+          B_INICIAR_PRESS   0x000065    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\07 - Andre Moreira Tavares\newpic_8b_simple.asm
+                TROCA_LED   0x00006d    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\07 - Andre Moreira Tavares\newpic_8b_simple.asm
+               ACENDE_LED   0x000070    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\07 - Andre Moreira Tavares\newpic_8b_simple.asm
+            TROCA_DISPLAY   0x000071    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\07 - Andre Moreira Tavares\newpic_8b_simple.asm
+            ACENDE_DEZENA   0x000074    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\07 - Andre Moreira Tavares\newpic_8b_simple.asm
+             TESTA_DEZENA   0x00007d    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\07 - Andre Moreira Tavares\newpic_8b_simple.asm
+           ACENDE_CENTENA   0x00007f    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\07 - Andre Moreira Tavares\newpic_8b_simple.asm
+            TESTA_CENTENA   0x000085    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\07 - Andre Moreira Tavares\newpic_8b_simple.asm
+            ACENDE_MILHAR   0x000087    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\07 - Andre Moreira Tavares\newpic_8b_simple.asm
+             TESTA_MILHAR   0x00008d    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\07 - Andre Moreira Tavares\newpic_8b_simple.asm
+
+

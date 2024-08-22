@@ -1,0 +1,48 @@
+MPLINK 5.08, LINKER
+Linker Map File - Created Wed Mar 06 14:37:40 2024
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                 RES_VECT       code   0x000000    program   0x000064
+                   .cinit    romdata   0x000032    program   0x000004
+.config_2007_BUILD/DEFAULT/PRODUCTION/NEWPIC_       code   0x002007    program   0x000002
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x000033      
+                            0x002007    0x002007      
+            53 out of 2182 program addresses used, program memory utilization is 2%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+            ANTIHOR_PRESS   0x00001a    program     static C:\Users\IFTM\Desktop\Nova Pasta\newpic_8b_simple.asm
+                   ETAPA1   0x00000c    program     static C:\Users\IFTM\Desktop\Nova Pasta\newpic_8b_simple.asm
+                   ETAPA2   0x00000f    program     static C:\Users\IFTM\Desktop\Nova Pasta\newpic_8b_simple.asm
+                   ETAPA3   0x000014    program     static C:\Users\IFTM\Desktop\Nova Pasta\newpic_8b_simple.asm
+                   ETAPA4   0x00001d    program     static C:\Users\IFTM\Desktop\Nova Pasta\newpic_8b_simple.asm
+                   ETAPA5   0x000026    program     static C:\Users\IFTM\Desktop\Nova Pasta\newpic_8b_simple.asm
+                   ETAPA6   0x00002c    program     static C:\Users\IFTM\Desktop\Nova Pasta\newpic_8b_simple.asm
+            HORARIO_PRESS   0x000017    program     static C:\Users\IFTM\Desktop\Nova Pasta\newpic_8b_simple.asm
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                   ETAPA1   0x00000c    program     static C:\Users\IFTM\Desktop\Nova Pasta\newpic_8b_simple.asm
+                   ETAPA2   0x00000f    program     static C:\Users\IFTM\Desktop\Nova Pasta\newpic_8b_simple.asm
+                   ETAPA3   0x000014    program     static C:\Users\IFTM\Desktop\Nova Pasta\newpic_8b_simple.asm
+            HORARIO_PRESS   0x000017    program     static C:\Users\IFTM\Desktop\Nova Pasta\newpic_8b_simple.asm
+            ANTIHOR_PRESS   0x00001a    program     static C:\Users\IFTM\Desktop\Nova Pasta\newpic_8b_simple.asm
+                   ETAPA4   0x00001d    program     static C:\Users\IFTM\Desktop\Nova Pasta\newpic_8b_simple.asm
+                   ETAPA5   0x000026    program     static C:\Users\IFTM\Desktop\Nova Pasta\newpic_8b_simple.asm
+                   ETAPA6   0x00002c    program     static C:\Users\IFTM\Desktop\Nova Pasta\newpic_8b_simple.asm
+
+

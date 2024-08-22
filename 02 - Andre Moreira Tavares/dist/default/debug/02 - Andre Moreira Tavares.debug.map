@@ -1,0 +1,48 @@
+MPLINK 5.08, LINKER
+Linker Map File - Created Thu Mar 07 22:23:31 2024
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                 RES_VECT       code   0x000000    program   0x000046
+                   .cinit    romdata   0x000023    program   0x000004
+.config_2007_BUILD/DEFAULT/DEBUG/NEWPIC_8B_SI       code   0x002007    program   0x000002
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x000024      
+                            0x002007    0x002007      
+            38 out of 2182 program addresses used, program memory utilization is 1%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+            DESLIGA_LEDB0   0x000016    program     static C:\Users\André\OneDrive\Área de Trabalho\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\02 - Andre Moreira Tavares\newpic_8b_simple.asm
+            DESLIGA_LEDB1   0x000019    program     static C:\Users\André\OneDrive\Área de Trabalho\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\02 - Andre Moreira Tavares\newpic_8b_simple.asm
+            DESLIGA_LEDB2   0x00001c    program     static C:\Users\André\OneDrive\Área de Trabalho\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\02 - Andre Moreira Tavares\newpic_8b_simple.asm
+            DESLIGA_LEDB3   0x00001f    program     static C:\Users\André\OneDrive\Área de Trabalho\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\02 - Andre Moreira Tavares\newpic_8b_simple.asm
+               LIGA_LEDB0   0x00000a    program     static C:\Users\André\OneDrive\Área de Trabalho\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\02 - Andre Moreira Tavares\newpic_8b_simple.asm
+               LIGA_LEDB1   0x00000d    program     static C:\Users\André\OneDrive\Área de Trabalho\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\02 - Andre Moreira Tavares\newpic_8b_simple.asm
+               LIGA_LEDB2   0x000010    program     static C:\Users\André\OneDrive\Área de Trabalho\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\02 - Andre Moreira Tavares\newpic_8b_simple.asm
+               LIGA_LEDB3   0x000013    program     static C:\Users\André\OneDrive\Área de Trabalho\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\02 - Andre Moreira Tavares\newpic_8b_simple.asm
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+               LIGA_LEDB0   0x00000a    program     static C:\Users\André\OneDrive\Área de Trabalho\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\02 - Andre Moreira Tavares\newpic_8b_simple.asm
+               LIGA_LEDB1   0x00000d    program     static C:\Users\André\OneDrive\Área de Trabalho\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\02 - Andre Moreira Tavares\newpic_8b_simple.asm
+               LIGA_LEDB2   0x000010    program     static C:\Users\André\OneDrive\Área de Trabalho\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\02 - Andre Moreira Tavares\newpic_8b_simple.asm
+               LIGA_LEDB3   0x000013    program     static C:\Users\André\OneDrive\Área de Trabalho\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\02 - Andre Moreira Tavares\newpic_8b_simple.asm
+            DESLIGA_LEDB0   0x000016    program     static C:\Users\André\OneDrive\Área de Trabalho\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\02 - Andre Moreira Tavares\newpic_8b_simple.asm
+            DESLIGA_LEDB1   0x000019    program     static C:\Users\André\OneDrive\Área de Trabalho\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\02 - Andre Moreira Tavares\newpic_8b_simple.asm
+            DESLIGA_LEDB2   0x00001c    program     static C:\Users\André\OneDrive\Área de Trabalho\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\02 - Andre Moreira Tavares\newpic_8b_simple.asm
+            DESLIGA_LEDB3   0x00001f    program     static C:\Users\André\OneDrive\Área de Trabalho\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\02 - Andre Moreira Tavares\newpic_8b_simple.asm
+
+
