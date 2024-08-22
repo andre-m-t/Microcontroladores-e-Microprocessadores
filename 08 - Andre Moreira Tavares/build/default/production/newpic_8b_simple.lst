@@ -1,0 +1,1170 @@
+MPASM 5.71              NEWPIC_8B_SIMPLE.ASM   5-7-2024  23:24:58         PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00001 ; PIC16F877A Configuration Bit Settings
+                      00002 ; Assembly source line config statements
+                      00003 #include "p16f877a.inc"
+                      00001         LIST
+                      00002 
+                      00003 ;==========================================================================
+                      00004 ; Build date : Nov 17 2016
+                      00005 ;  MPASM PIC16F877A processor include
+                      00006 ; 
+                      00007 ;  (c) Copyright 1999-2016 Microchip Technology, All rights reserved
+                      00008 ;==========================================================================
+                      00009 
+                      00567         LIST
+                      00004 ; CONFIG
+                      00005 ; __config 0xFF71
+2007   3F71           00006  __CONFIG _FOSC_XT & _WDTE_OFF & _PWRTE_ON & _BOREN_ON & _LVP_OFF & _CPD_OFF & _WRT_OFF & _CP_OFF
+                      00007 
+                      00008 #define BANK0      BCF STATUS,RP0
+                      00009 #define BANK1      BSF STATUS,RP0
+                      00010  
+                      00011  CBLOCK 0X20
+  00000020            00012     FLAGS
+  00000021            00013     FILTRO
+  00000022            00014     UNIDADE
+  00000023            00015     DEZENA
+  00000024            00016     CENTENA
+  00000025            00017     MILHAR
+  00000026            00018     W_TEMP
+  00000027            00019     S_TEMP
+  00000028            00020     VALOR_ADC_H
+  00000029            00021     VALOR_ADC_L
+  0000002A            00022     VALOR_ADC0_H
+  0000002B            00023     VALOR_ADC0_L
+  0000002C            00024     VALOR_ADC1_H
+  0000002D            00025     VALOR_ADC1_L
+  0000002E            00026     CONTADOR
+  0000002F            00027     R_H
+  00000030            00028     R_L
+  00000031            00029     X_H
+  00000032            00030     X_L
+  00000033            00031     Y_H
+  00000034            00032     Y_L
+  00000035            00033     DELAY_ADC
+  00000036            00034     H_POTENCIOMETRO
+  00000037            00035     L_POTENCIOMETRO
+  00000038            00036     H_TEMPERATURA
+  00000039            00037     L_TEMPERATURA
+  0000003A            00038     U_POT
+  0000003B            00039     D_POT
+  0000003C            00040     C_POT
+  0000003D            00041     M_POT
+  0000003E            00042     U_TEMP
+  0000003F            00043     D_TEMP
+MPASM 5.71              NEWPIC_8B_SIMPLE.ASM   5-7-2024  23:24:58         PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+  00000040            00044     C_TEMP
+  00000041            00045     M_TEMP
+                      00046  ENDC
+                      00047  
+                      00048 #define ACAO            FLAGS,0
+                      00049 #define INT_ATIVA       FLAGS,1
+                      00050 #define FIM_TEMPO       FLAGS,2
+                      00051 #define EH_NEGATIVO     FLAGS,3
+                      00052 #define QUAL_CANAL      FLAGS,4
+                      00053 #define AQUECENDO       FLAGS,5 
+                      00054  
+                      00055 #define DISPLAY         PORTD
+                      00056 #define D_UNIDADE       PORTB,4
+                      00057 #define D_DEZENA        PORTB,5
+                      00058 #define D_CENTENA       PORTB,6
+                      00059 #define D_MILHAR        PORTB,7
+                      00060 #define B_POT           PORTB,0
+                      00061 #define B_TEMP          PORTB,1
+                      00062 #define LIGA            PORTB,2
+                      00063 #define DESLIGA         PORTB,3
+                      00064 #define HEATER          PORTC,2
+                      00065 #define COOLER          PORTC,1
+                      00066  
+  00000006            00067 V_TMR0      equ     .6      ;256 - 6 = 250 pulsos -> 250*0,5*16 = 2ms
+                      00068 
+  00000064            00069 V_FILTRO    equ     .100
+  00000004            00070 V_CONT      equ     .4
+                      00071 ;programa ===================================================
+                      00072 RES_VECT    CODE    0x0000            ; reset vector
+0000   2???           00073     GOTO    START                   ; go to beginning of program
+                      00074 
+                      00075 INTERRUPT_VECT  CODE    0x0004
+0004   00A6           00076     MOVWF   W_TEMP
+0005   0803           00077     MOVF    STATUS,W
+0006   00A7           00078     MOVWF   S_TEMP
+0007   1D0B           00079     BTFSS   INTCON,T0IF
+0008   2???           00080     GOTO    SAI_INTERRUPCAO
+0009   110B           00081     BCF     INTCON,T0IF    
+000A   3006           00082     MOVLW   V_TMR0
+000B   0781           00083     ADDWF   TMR0,F
+000C   14A0           00084     BSF     INT_ATIVA
+000D   0BAE           00085     DECFSZ  CONTADOR,F
+000E   2???           00086     GOTO    SAI_INTERRUPCAO
+000F   1520           00087     BSF     FIM_TEMPO
+0010   3004           00088     MOVLW   V_CONT
+0011   00AE           00089     MOVWF   CONTADOR
+0012                  00090 SAI_INTERRUPCAO
+0012   0827           00091     MOVF    S_TEMP,W
+0013   0083           00092     MOVWF   STATUS
+0014   0826           00093     MOVF    W_TEMP,W
+0015   0009           00094     RETFIE
+                      00095     
+0016                  00096 START
+MPASM 5.71              NEWPIC_8B_SIMPLE.ASM   5-7-2024  23:24:58         PAGE  3
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0016   1683           00097     BANK1
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0017   0188           00098     CLRF    TRISD   ;DEFINE PORTD COMO SAIDA
+0018   300F           00099     MOVLW   B'00001111'
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0019   0086           00100     MOVWF   TRISB   ;DEFININDO PINOS DA TROCA DE DISPLAY
+                      00101     
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+001A   1107           00102     BCF     TRISC,2 ;DEFININDO HEATER COMO SAIDA
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+001B   1087           00103     BCF     TRISC,1 ;DEFININDO COOLER COMO SAIDA
+001C   3053           00104     MOVLW   B'01010011' ;valor para configurar o TIMER0(ps:16)
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+001D   0081           00105     MOVWF   OPTION_REG  ;carrega valor no TIMER0
+001E   30C4           00106     MOVLW   B'11000100' ;bit 7 - justificar   direita
+                      00107             ;bit 6 - clock gerado por RC
+                      00108             ;bit 5 e 4 - n o usado
+                      00109             ;bit 3,2,1,0 - seleciona AN0, AN1 e AN3 como entradas anal gicas
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+001F   009F           00110     MOVWF   ADCON1  ;carregar valor no ADCON1
+0020   1283           00111     BANK0
+0021   30C1           00112     MOVLW   B'11000001' ;bit 7 e 6 - clock gerado por RC
+                      00113             ;bit 5,4,3 - seleciona a entrada AN0 para leitura
+                      00114             ;bit 2 - inicia e indica que a convers o finalizou
+                      00115             ;bit 1 - n o usado
+                      00116             ;bit 0 - liga o conversor           
+0022   009F           00117     MOVWF   ADCON0  ;carregar valor no ADCON0    
+                      00118     ;SETANDO AS SAIDAS NO INICIO DO PROGRAMA
+0023   0188           00119     CLRF    DISPLAY
+0024   1206           00120     BCF     D_UNIDADE
+0025   1286           00121     BCF     D_DEZENA
+0026   1306           00122     BCF     D_CENTENA
+0027   1386           00123     BCF     D_MILHAR    
+0028   01A2           00124     CLRF    UNIDADE
+0029   01A3           00125     CLRF    DEZENA
+002A   01A4           00126     CLRF    CENTENA
+002B   01A5           00127     CLRF    MILHAR    
+002C   3064           00128     MOVLW   V_FILTRO
+002D   00A1           00129     MOVWF   FILTRO
+002E   1120           00130     BCF     FIM_TEMPO
+002F   3004           00131     MOVLW   V_CONT
+0030   00AE           00132     MOVWF   CONTADOR
+0031   1020           00133     BCF     ACAO
+0032   10A0           00134     BCF     INT_ATIVA
+0033   1620           00135     BSF     QUAL_CANAL
+0034   1107           00136     BCF     HEATER
+0035   3006           00137     MOVLW   V_TMR0
+0036   0081           00138     MOVWF   TMR0
+0037   168B           00139     BSF     INTCON,T0IE         ;PERMITE ATENDER INTERRUPCOES POR TMR0
+0038   178B           00140     BSF     INTCON,GIE          ;PERMITE ATENDER INTERRUPCOES
+0039                  00141 LACO_PRINCIPAL
+0039   1C86           00142     BTFSS   B_TEMP              ;TESTA SE BOTAO DE TEMPERATURA FOI PRESSIONADO
+003A   1220           00143     BCF     QUAL_CANAL          ;QUAL_CANAL = 0
+MPASM 5.71              NEWPIC_8B_SIMPLE.ASM   5-7-2024  23:24:58         PAGE  4
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+003B   1C06           00144     BTFSS   B_POT               ;TESTA SE BOTAO DE POTENCIOMETRO FOI PRESSIONADO
+003C   1620           00145     BSF     QUAL_CANAL          ;QUAL_CANAL = 1
+003D   1D06           00146     BTFSS   LIGA                ;TESTA SE BOTAO LIGAR FOI PRESSIONADO
+003E   16A0           00147     BSF     AQUECENDO           ;ATIVA BIT AUXILIAR DE AQUECENDO
+003F   1D86           00148     BTFSS   DESLIGA             ;TESTA SE BOTAO DESLIGAR FOI PRESSIONADO
+0040   2???           00149     CALL    DESLIGA_AQUECENDO   ;CHAMA SUBROTINA PARA DESLIGAR O AQUECENDO
+                      00150     
+0041   18A0           00151     BTFSC   INT_ATIVA
+0042   2???           00152     CALL    ATUALIZA_DISPLAY
+0043   1D20           00153     BTFSS   FIM_TEMPO
+0044   2???           00154     GOTO    LACO_PRINCIPAL
+0045   1120           00155     BCF     FIM_TEMPO
+0046   30C7           00156     MOVLW   B'11000111' ;seleciona canal AN0        
+0047   059F           00157     ANDWF   ADCON0,F    ;carregar valor no ADCON0
+0048   3013           00158     MOVLW   .19
+0049   00B5           00159     MOVWF   DELAY_ADC
+004A   0BB5           00160     DECFSZ  DELAY_ADC,F
+004B   2???           00161     GOTO    $-1
+                      00162     ;inicia a convers o
+004C   151F           00163     BSF     ADCON0,GO
+                      00164     ;aguarda o final da convers o
+004D   191F           00165     BTFSC   ADCON0,GO
+004E   2???           00166     GOTO    $-1
+004F   081E           00167     MOVF    ADRESH,W        ;l  os 8 bits mais significativos da convers o AD
+0050   00AA           00168     MOVWF   VALOR_ADC0_H    ;carrega na vari vel VALOR_ADC0_H
+0051   1683           00169     BANK1
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0052   081E           00170     MOVF    ADRESL,W        ;l  os 8 bits menos significativos da convers o AD
+0053   1283           00171     BANK0
+0054   00AB           00172     MOVWF   VALOR_ADC0_L    ;carrega na vari vel VALOR_ADC0_L 
+                      00173     ;le e converte a entrada anal gica AN1 
+0055   159F           00174     BSF     ADCON0,3    ;seleciona para o canal AN1 ADCON0 = xx001xxx 
+                      00175     ;temporizar antes de ativar a convers o 
+0056   3013           00176     MOVLW   .19
+0057   00B5           00177     MOVWF   DELAY_ADC
+0058   0BB5           00178     DECFSZ  DELAY_ADC,F
+0059   2???           00179     GOTO    $-1
+                      00180     ;inicia a convers o
+005A   151F           00181     BSF     ADCON0,GO
+                      00182     ;aguarda o final da convers o
+005B   191F           00183     BTFSC   ADCON0,GO
+005C   2???           00184     GOTO    $-1
+005D   081E           00185     MOVF    ADRESH,W        ;l  os 8 bits mais significativos da convers o AD
+005E   00AC           00186     MOVWF   VALOR_ADC1_H    ;carrega na vari vel VALOR_ADC1_H
+005F   1683           00187     BANK1
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0060   081E           00188     MOVF    ADRESL,W        ;l  os 8 bits menos significativos da convers o AD
+0061   1283           00189     BANK0
+0062   00AD           00190     MOVWF   VALOR_ADC1_L    ;carrega na vari vel VALOR_ADC1_L
+0063   1AA0           00191     BTFSC   AQUECENDO
+0064   2???           00192     CALL    CONTROLA_AQUECENDO
+0065   1E20           00193     BTFSS   QUAL_CANAL
+0066   2???           00194     GOTO    MOSTRA_CANAL_0
+MPASM 5.71              NEWPIC_8B_SIMPLE.ASM   5-7-2024  23:24:58         PAGE  5
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0067                  00195 MOSTRA_CANAL_1          ;preparar para mostrar o canal 1
+0067   082C           00196     MOVF    VALOR_ADC1_H,W
+0068   00A8           00197     MOVWF   VALOR_ADC_H
+0069   082D           00198     MOVF    VALOR_ADC1_L,W
+006A   00A9           00199     MOVWF   VALOR_ADC_L    
+006B   2???           00200     GOTO    MOSTRA_NO_DISPLAY
+006C                  00201 MOSTRA_CANAL_0    
+006C   082A           00202     MOVF    VALOR_ADC0_H,W
+006D   00A8           00203     MOVWF   VALOR_ADC_H
+006E   082B           00204     MOVF    VALOR_ADC0_L,W
+006F   00A9           00205     MOVWF   VALOR_ADC_L     
+0070                  00206 MOSTRA_NO_DISPLAY    
+0070   01A2           00207     CLRF    UNIDADE
+0071   01A3           00208     CLRF    DEZENA
+0072   01A4           00209     CLRF    CENTENA
+0073   01A5           00210     CLRF    MILHAR
+0074                  00211 EXTRAI_MILHAR
+0074   0828           00212     MOVF    VALOR_ADC_H,W
+0075   00B1           00213     MOVWF   X_H
+0076   0829           00214     MOVF    VALOR_ADC_L,W
+0077   00B2           00215     MOVWF   X_L  
+0078   3003           00216     MOVLW   0X03
+0079   00B3           00217     MOVWF   Y_H
+007A   30E8           00218     MOVLW   0XE8
+007B   00B4           00219     MOVWF   Y_L    
+007C   2???           00220     CALL    SUBTRACAO_16BITS
+007D   19A0           00221     BTFSC   EH_NEGATIVO
+007E   2???           00222     GOTO    EXTRAI_CENTENA
+007F   082F           00223     MOVF    R_H,W
+0080   00A8           00224     MOVWF   VALOR_ADC_H
+0081   0830           00225     MOVF    R_L,W
+0082   00A9           00226     MOVWF   VALOR_ADC_L    
+0083   0AA5           00227     INCF    MILHAR,F
+0084   2???           00228     GOTO    EXTRAI_MILHAR  
+0085                  00229 EXTRAI_CENTENA
+0085   0828           00230     MOVF    VALOR_ADC_H,W
+0086   00B1           00231     MOVWF   X_H
+0087   0829           00232     MOVF    VALOR_ADC_L,W
+0088   00B2           00233     MOVWF   X_L 
+0089   3000           00234     MOVLW   .0
+008A   00B3           00235     MOVWF   Y_H
+008B   3064           00236     MOVLW   .100
+008C   00B4           00237     MOVWF   Y_L    
+008D   2???           00238     CALL    SUBTRACAO_16BITS
+008E   19A0           00239     BTFSC   EH_NEGATIVO
+008F   2???           00240     GOTO    EXTRAI_DEZENA
+0090   082F           00241     MOVF    R_H,W
+0091   00A8           00242     MOVWF   VALOR_ADC_H
+0092   0830           00243     MOVF    R_L,W
+0093   00A9           00244     MOVWF   VALOR_ADC_L    
+0094   0AA4           00245     INCF    CENTENA,F
+0095   2???           00246     GOTO    EXTRAI_CENTENA    
+0096                  00247 EXTRAI_DEZENA
+MPASM 5.71              NEWPIC_8B_SIMPLE.ASM   5-7-2024  23:24:58         PAGE  6
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0096   300A           00248     MOVLW   .10
+0097   0229           00249     SUBWF   VALOR_ADC_L,W
+0098   1C03           00250     BTFSS   STATUS,C
+0099   2???           00251     GOTO    EXTRAI_UNIDADE
+009A   00A9           00252     MOVWF   VALOR_ADC_L
+009B   0AA3           00253     INCF    DEZENA,F
+009C   2???           00254     GOTO    EXTRAI_DEZENA
+009D                  00255 EXTRAI_UNIDADE
+009D   0829           00256     MOVF    VALOR_ADC_L,W
+009E   00A2           00257     MOVWF   UNIDADE
+009F   2???           00258     GOTO    LACO_PRINCIPAL    
+00A0                  00259 CONTROLA_AQUECENDO
+00A0   1087           00260     BCF     COOLER
+00A1   082C           00261     MOVF    VALOR_ADC1_H,W
+00A2   00B1           00262     MOVWF   X_H
+00A3   082D           00263     MOVF    VALOR_ADC1_L,W
+00A4   00B2           00264     MOVWF   X_L  
+00A5   082A           00265     MOVF    VALOR_ADC0_H,W
+00A6   00B3           00266     MOVWF   Y_H
+00A7   082B           00267     MOVF    VALOR_ADC0_L,W
+00A8   00B4           00268     MOVWF   Y_L    
+00A9   2???           00269     CALL    SUBTRACAO_16BITS
+00AA   19A0           00270     BTFSC   EH_NEGATIVO
+00AB   2???           00271     GOTO    DESLIGA_HEATER
+00AC   1507           00272     BSF     HEATER
+00AD   0008           00273     RETURN    
+00AE                  00274 DESLIGA_HEATER    
+00AE   1107           00275     BCF     HEATER
+00AF   0008           00276     RETURN
+00B0                  00277 SUBTRACAO_16BITS
+00B0   11A0           00278     BCF     EH_NEGATIVO
+00B1   0834           00279     MOVF    Y_L,W
+00B2   0232           00280     SUBWF   X_L,W
+00B3   00B0           00281     MOVWF   R_L
+00B4   1C03           00282     BTFSS   STATUS,C
+00B5   15A0           00283     BSF     EH_NEGATIVO
+00B6   0833           00284     MOVF    Y_H,W
+00B7   0231           00285     SUBWF   X_H,W
+00B8   00AF           00286     MOVWF   R_H
+00B9   1803           00287     BTFSC   STATUS,C
+00BA   2???           00288     GOTO    E_POSITIVO_MSB
+00BB   15A0           00289     BSF     EH_NEGATIVO
+00BC   0008           00290     RETURN
+00BD                  00291 E_POSITIVO_MSB
+00BD   1DA0           00292     BTFSS   EH_NEGATIVO
+00BE   0008           00293     RETURN
+00BF   3001           00294     MOVLW   .1
+00C0   02AF           00295     SUBWF   R_H,F
+00C1   1C03           00296     BTFSS   STATUS,C
+00C2   2???           00297     GOTO    E_EH_NEGATIVO
+00C3   11A0           00298     BCF     EH_NEGATIVO
+00C4   0008           00299     RETURN
+00C5                  00300 E_EH_NEGATIVO
+MPASM 5.71              NEWPIC_8B_SIMPLE.ASM   5-7-2024  23:24:58         PAGE  7
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+00C5   15A0           00301     BSF     EH_NEGATIVO
+00C6   0008           00302     RETURN
+00C7                  00303 ATUALIZA_DISPLAY
+00C7   10A0           00304     BCF     INT_ATIVA
+00C8   1E06           00305     BTFSS   D_UNIDADE
+00C9   2???           00306     GOTO    TESTA_DISPLAY_DEZENA
+00CA   1206           00307     BCF     D_UNIDADE
+00CB   0823           00308     MOVF    DEZENA,W
+00CC   2???           00309     CALL    BUSCA_CODIGO
+00CD   0088           00310     MOVWF   DISPLAY
+00CE   1686           00311     BSF     D_DEZENA
+00CF   0008           00312     RETURN
+00D0                  00313 TESTA_DISPLAY_DEZENA
+00D0   1E86           00314     BTFSS   D_DEZENA
+00D1   2???           00315     GOTO    TESTA_DISPLAY_CENTENA
+00D2   1286           00316     BCF     D_DEZENA
+00D3   0824           00317     MOVF    CENTENA,W
+00D4   2???           00318     CALL    BUSCA_CODIGO
+00D5   0088           00319     MOVWF   DISPLAY
+00D6   1706           00320     BSF     D_CENTENA
+00D7   0008           00321     RETURN
+00D8                  00322 TESTA_DISPLAY_CENTENA    
+00D8   1F06           00323     BTFSS   D_CENTENA
+00D9   2???           00324     GOTO    TESTA_DISPLAY_MILHAR
+00DA   1306           00325     BCF     D_CENTENA
+00DB   0825           00326     MOVF    MILHAR,W
+00DC   2???           00327     CALL    BUSCA_CODIGO
+00DD   0088           00328     MOVWF   DISPLAY
+00DE   1786           00329     BSF     D_MILHAR
+00DF   0008           00330     RETURN
+00E0                  00331 TESTA_DISPLAY_MILHAR
+00E0   1386           00332     BCF     D_MILHAR
+00E1   0822           00333     MOVF    UNIDADE,W
+00E2   2???           00334     CALL    BUSCA_CODIGO
+00E3   0088           00335     MOVWF   DISPLAY
+00E4   1606           00336     BSF     D_UNIDADE
+00E5   0008           00337     RETURN   
+                      00338     
+00E6                  00339 DESLIGA_AQUECENDO
+00E6   12A0           00340     BCF     AQUECENDO
+00E7   2???           00341     CALL    RESFRIAMENTO_30GRAUS
+00E8   0008           00342     RETURN
+                      00343     
+00E9                  00344 BUSCA_CODIGO
+00E9   0782           00345     ADDWF   PCL,F   
+00EA   343F           00346     RETLW   .63     ;0 
+00EB   3406           00347     RETLW   .6      ;1 
+00EC   345B           00348     RETLW   .91     ;2 
+00ED   344F           00349     RETLW   .79     ;3 
+00EE   3466           00350     RETLW   .102    ;4
+00EF   346D           00351     RETLW   .109    ;5 
+00F0   347D           00352     RETLW   .125    ;6 
+00F1   3407           00353     RETLW   .7      ;7
+MPASM 5.71              NEWPIC_8B_SIMPLE.ASM   5-7-2024  23:24:58         PAGE  8
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+00F2   347F           00354     RETLW   .127    ;8 
+00F3   346F           00355     RETLW   .111    ;9 
+00F4   3400           00356     RETLW   .0      ;APAGADO    
+                      00357     
+                      00358     
+                      00359     
+00F5                  00360 LER_TEMPERATURA
+                      00361     ;GARANTINDO QUE ESTOU NO CANAL DA TEMPERATURA
+00F5   119F           00362     BCF     ADCON0,3        ;reseta o bit4 para seleciona o canal 0
+                      00363     ;BSF            QUAL_CANAL
+                      00364     ;LEITURA DO VALOR DA TEMP
+00F6   151F           00365     BSF     ADCON0,GO               ;inicia a conversão
+00F7   191F           00366     BTFSC   ADCON0,GO               ;testa se finalizou a conversão
+00F8   2???           00367     GOTO    $-1                     ;mesma coisa de  GOTO TESTA_FIM
+00F9   081E           00368     MOVF    ADRESH,W                ;lê os 8MSBs do resultado da conversão
+00FA   00B8           00369     MOVWF   H_TEMPERATURA           ;VALOR_ADC_H = ADRESH
+00FB   1683           00370     BANK1                           ;seleciona banco 1 da memória RAM
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+00FC   081E           00371     MOVF    ADRESL,W                ;lê os 8LSBs do resultado da conversão
+00FD   1283           00372     BANK0                           ;seleciona banco 0 da memória RAM
+00FE   00B9           00373     MOVWF   L_TEMPERATURA           ;VALOR_ADC_L = ADRESL
+00FF   01C1           00374     CLRF    M_TEMP          ;MILHAR = 0
+0100                  00375 EXTRAI_MILHAR_TEMP    
+0100   0838           00376     MOVF    H_TEMPERATURA,W   ;W = VALOR_ADC_H
+0101   00B1           00377     MOVWF   X_H             ;X_H = VALOR_ADC_H
+0102   0839           00378     MOVF    L_TEMPERATURA,W   ;W = VALOR_ADC_L
+0103   00B2           00379     MOVWF   X_L             ;X_L = VALOR_ADC_L  
+0104   3003           00380     MOVLW   0x03            ;W = 0x03
+0105   00B3           00381     MOVWF   Y_H             ;Y_H = 0x03
+0106   30E8           00382     MOVLW   0xE8            ;W = 0xE8
+0107   00B4           00383     MOVWF   Y_L             ;Y_L = 0xE8 
+0108   2???           00384     CALL    SUBTRACAO_16BITS        ;chama rotina de subtração de 16 bits
+0109   19A0           00385     BTFSC   EH_NEGATIVO     ;testa se o resultado da operação deu EH_NEGATIVO
+010A   2???           00386     GOTO    TRATA_CENTENA_TEMP   ;se EH_NEGATIVO pula para TRATA_CENTENA
+010B   082F           00387     MOVF    R_H,W           ;W = R_H
+010C   00B8           00388     MOVWF   H_TEMPERATURA           ;VALOR_ADC_H = R_H
+010D   0830           00389     MOVF    R_L,W           ;W = R_L
+010E   00B9           00390     MOVWF   L_TEMPERATURA           ;VALOR_ADC_L = R_L    
+010F   0AC1           00391     INCF    M_TEMP,F        ;MILHAR++
+0110   2???           00392     GOTO    EXTRAI_MILHAR_TEMP   ;pula para EXTRAI_MILHAR
+0111                  00393 TRATA_CENTENA_TEMP    
+0111   01C0           00394     CLRF    C_TEMP          ;CENTENA = 0
+0112                  00395 EXTRAI_CENTENA_TEMP  
+0112   0838           00396     MOVF    H_TEMPERATURA,W   ;W = VALOR_ADC_H
+0113   00B1           00397     MOVWF   X_H             ;X_H = VALOR_ADC_H
+0114   0839           00398     MOVF    L_TEMPERATURA,W   ;W = VALOR_ADC_L
+0115   00B2           00399     MOVWF   X_L             ;X_L = VALOR_ADC_L  
+0116   3000           00400     MOVLW   0x00            ;W = 0x00
+0117   00B3           00401     MOVWF   Y_H             ;Y_H = 0x03
+0118   3064           00402     MOVLW   0x64            ;W = 0x64
+0119   00B4           00403     MOVWF   Y_L             ;Y_L = 0xE8 
+011A   2???           00404     CALL    SUBTRACAO_16BITS        ;chama rotina de subtração de 16 bits    
+011B   19A0           00405     BTFSC   EH_NEGATIVO     ;testa se o resultado da operação deu EH_NEGATIVO
+MPASM 5.71              NEWPIC_8B_SIMPLE.ASM   5-7-2024  23:24:58         PAGE  9
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+011C   2???           00406     GOTO    TRATA_DEZENA_TEMP    ;se EH_NEGATIVO pula para TRATA_DEZENA    
+011D   082F           00407     MOVF    R_H,W           ;W = R_H
+011E   00B8           00408     MOVWF   H_TEMPERATURA           ;VALOR_ADC_H = R_H
+011F   0830           00409     MOVF    R_L,W           ;W = R_L
+0120   00B9           00410     MOVWF   L_TEMPERATURA           ;VALOR_ADC_L = R_L    
+0121   0AC0           00411     INCF    C_TEMP,F        ;CENTENA++
+0122   2???           00412     GOTO    EXTRAI_CENTENA_TEMP  ;pula para EXTRAI_CENTENA    
+0123                  00413 TRATA_DEZENA_TEMP
+0123   01BF           00414     CLRF    D_TEMP          ;DEZENA = 0
+0124                  00415 EXTRAI_DEZENA_TEMP
+0124   300A           00416     MOVLW   .10             ;W = 10
+0125   0239           00417     SUBWF   L_TEMPERATURA,W   ;W = VALOR_ADC_L - W
+0126   1C03           00418     BTFSS   STATUS,C        ;testa se o resultado é EH_NEGATIVO
+0127   2???           00419     GOTO    TRATA_UNIDADE_TEMP  ;se EH_NEGATIVO, pula para verificar valor unidade
+0128   00B9           00420     MOVWF   L_TEMPERATURA           ;VALOR_ADC_L = W = VALOR_ADC_L - 10
+0129   0ABF           00421     INCF    D_TEMP,F        ;DEZENA++
+012A   2???           00422     GOTO    EXTRAI_DEZENA_TEMP   ;    
+012B                  00423 TRATA_UNIDADE_TEMP
+012B   0839           00424     MOVF    L_TEMPERATURA,W   ;W = VALOR_ADC_L
+012C   00BE           00425     MOVWF   U_TEMP          ;UNIDADE = VALOR_ADC_L 
+012D   0008           00426     RETURN
+                      00427     
+                      00428 
+                      00429     
+                      00430     
+012E                  00431 LER_POTENCIOMETRO
+                      00432     ;GARANTINDO QUE ESTOU NO CANAL DO POTENCIOMETRO
+012E   159F           00433     BSF     ADCON0,3        ;reseta o bit4 para seleciona o canal 1
+                      00434     ;BCF            QUAL_CANAL
+                      00435     ;LEITURA DO VALOR SETADO NO POT
+012F   151F           00436     BSF     ADCON0,GO               ;inicia a conversãO
+0130   191F           00437     BTFSC   ADCON0,GO               ;testa se finalizou a conversão
+0131   2???           00438     GOTO    $-1                     ;mesma coisa de  GOTO TESTA_FIM
+0132   081E           00439     MOVF    ADRESH,W                ;lê os 8MSBs do resultado da conversão
+0133   00B6           00440     MOVWF   H_POTENCIOMETRO         ;VALOR_ADC_H = ADRESH
+0134   1683           00441     BANK1                           ;seleciona banco 1 da memória RAM
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0135   081E           00442     MOVF    ADRESL,W                ;lê os 8LSBs do resultado da conversão
+0136   1283           00443     BANK0                           ;seleciona banco 0 da memória RAM
+0137   00B7           00444     MOVWF   L_POTENCIOMETRO         ;VALOR_ADC_L = ADRESL
+0138   01BD           00445     CLRF    M_POT           ;MILHAR = 0
+0139                  00446 EXTRAI_MILHAR_POT    
+0139   0836           00447     MOVF    H_POTENCIOMETRO,W   ;W = VALOR_ADC_H
+013A   00B1           00448     MOVWF   X_H             ;X_H = VALOR_ADC_H
+013B   0837           00449     MOVF    L_POTENCIOMETRO,W   ;W = VALOR_ADC_L
+013C   00B2           00450     MOVWF   X_L             ;X_L = VALOR_ADC_L  
+013D   3003           00451     MOVLW   0x03            ;W = 0x03
+013E   00B3           00452     MOVWF   Y_H             ;Y_H = 0x03
+013F   30E8           00453     MOVLW   0xE8            ;W = 0xE8
+0140   00B4           00454     MOVWF   Y_L             ;Y_L = 0xE8 
+0141   2???           00455     CALL    SUBTRACAO_16BITS        ;chama rotina de subtração de 16 bits
+0142   19A0           00456     BTFSC   EH_NEGATIVO     ;testa se o resultado da operação deu EH_NEGATIVO
+0143   2???           00457     GOTO    TRATA_CENTENA_POT   ;se EH_NEGATIVO pula para TRATA_CENTENA
+MPASM 5.71              NEWPIC_8B_SIMPLE.ASM   5-7-2024  23:24:58         PAGE 10
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0144   082F           00458     MOVF    R_H,W           ;W = R_H
+0145   00B6           00459     MOVWF   H_POTENCIOMETRO         ;VALOR_ADC_H = R_H
+0146   0830           00460     MOVF    R_L,W           ;W = R_L
+0147   00B7           00461     MOVWF   L_POTENCIOMETRO         ;VALOR_ADC_L = R_L    
+0148   0ABD           00462     INCF    M_POT,F         ;MILHAR++
+0149   2???           00463     GOTO    EXTRAI_MILHAR_POT   ;pula para EXTRAI_MILHAR
+014A                  00464 TRATA_CENTENA_POT    
+014A   01BC           00465     CLRF    C_POT           ;CENTENA = 0
+014B                  00466 EXTRAI_CENTENA_POT  
+014B   0836           00467     MOVF    H_POTENCIOMETRO,W   ;W = VALOR_ADC_H
+014C   00B1           00468     MOVWF   X_H             ;X_H = VALOR_ADC_H
+014D   0837           00469     MOVF    L_POTENCIOMETRO,W   ;W = VALOR_ADC_L
+014E   00B2           00470     MOVWF   X_L             ;X_L = VALOR_ADC_L  
+014F   3000           00471     MOVLW   0x00            ;W = 0x00
+0150   00B3           00472     MOVWF   Y_H             ;Y_H = 0x03
+0151   3064           00473     MOVLW   0x64            ;W = 0x64
+0152   00B4           00474     MOVWF   Y_L             ;Y_L = 0xE8 
+0153   2???           00475     CALL    SUBTRACAO_16BITS        ;chama rotina de subtração de 16 bits    
+0154   19A0           00476     BTFSC   EH_NEGATIVO     ;testa se o resultado da operação deu EH_NEGATIVO
+0155   2???           00477     GOTO    TRATA_DEZENA_POT    ;se EH_NEGATIVO pula para TRATA_DEZENA    
+0156   082F           00478     MOVF    R_H,W           ;W = R_H
+0157   00B6           00479     MOVWF   H_POTENCIOMETRO         ;VALOR_ADC_H = R_H
+0158   0830           00480     MOVF    R_L,W           ;W = R_L
+0159   00B7           00481     MOVWF   L_POTENCIOMETRO         ;VALOR_ADC_L = R_L    
+015A   0ABC           00482     INCF    C_POT,F         ;CENTENA++
+015B   2???           00483     GOTO    EXTRAI_CENTENA_POT  ;pula para EXTRAI_CENTENA    
+015C                  00484 TRATA_DEZENA_POT
+015C   01BB           00485     CLRF    D_POT           ;DEZENA = 0
+015D                  00486 EXTRAI_DEZENA_POT
+015D   300A           00487     MOVLW   .10             ;W = 10
+015E   0237           00488     SUBWF   L_POTENCIOMETRO,W   ;W = VALOR_ADC_L - W
+015F   1C03           00489     BTFSS   STATUS,C        ;testa se o resultado é EH_NEGATIVO
+0160   2???           00490     GOTO    TRATA_UNIDADE_POT   ;se EH_NEGATIVO, pula para verificar valor unidade
+0161   00B7           00491     MOVWF   L_POTENCIOMETRO         ;VALOR_ADC_L = W = VALOR_ADC_L - 10
+0162   0ABB           00492     INCF    D_POT,F         ;DEZENA++
+0163   2???           00493     GOTO    EXTRAI_DEZENA_POT   ;    
+0164                  00494 TRATA_UNIDADE_POT
+0164   0837           00495     MOVF    L_POTENCIOMETRO,W   ;W = VALOR_ADC_L
+0165   00BA           00496     MOVWF   U_POT           ;UNIDADE = VALOR_ADC_L 
+0166   0008           00497     RETURN
+                      00498     
+                      00499     
+0167                  00500 RESFRIAMENTO_30GRAUS
+                      00501 ;DESATIVANDO INTERRUPÇÕES PARA NAO HAVER BUGS DE DISPLAY
+0167   138B           00502     BCF     INTCON,GIE      ;NAO permite atender interrupções
+0168   128B           00503     BCF     INTCON,T0IE     ;permite atender interrupção por TMR0
+0169   1107           00504     BCF     HEATER
+                      00505     ;LEITURA DO POTENCIOMETRO E TEMPERATURA
+016A   3000           00506     MOVLW    .0
+016B   00BD           00507     MOVWF   M_POT
+016C   3003           00508     MOVLW    .3
+016D   00BC           00509     MOVWF   C_POT
+016E   3006           00510     MOVLW    .6
+MPASM 5.71              NEWPIC_8B_SIMPLE.ASM   5-7-2024  23:24:58         PAGE 11
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+016F   00BB           00511     MOVWF   D_POT
+0170   3000           00512     MOVLW    .0
+0171   00BA           00513     MOVWF   U_POT
+0172   2???           00514     CALL    LER_TEMPERATURA
+                      00515     ;TESTAR SE VALOR ESTA ABAIXO OU ACIMA DA TEMPERATURA
+0173   151F           00516     BSF     ADCON0,GO       ;inicia a conversão    
+0174   191F           00517     BTFSC   ADCON0,GO       ;testa se finalizou a conversão
+0175   2???           00518     GOTO    $-1             ;mesma coisa de  GOTO TESTA_FIM
+0176   081E           00519     MOVF    ADRESH,W        ;lê os 8MSBs do resultado da conversão
+0177   00A8           00520     MOVWF   VALOR_ADC_H     ;VALOR_ADC_H = ADRESH
+0178   1683           00521     BANK1                   ;seleciona banco 1 da memória RAM
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0179   081E           00522     MOVF    ADRESL,W        ;lê os 8LSBs do resultado da conversão
+017A   1283           00523     BANK0                   ;seleciona banco 0 da memória RAM
+017B   00A9           00524     MOVWF   VALOR_ADC_L     ;VALOR_ADC_L = ADRESL
+017C   0828           00525     MOVF    VALOR_ADC_H,W   ;W = VALOR_ADC_H
+017D   00B1           00526     MOVWF   X_H             ;X_H = VALOR_ADC_H
+017E   0829           00527     MOVF    VALOR_ADC_L,W   ;W = VALOR_ADC_L
+017F   00B2           00528     MOVWF   X_L             ;X_L = VALOR_ADC_L  
+0180   3001           00529     MOVLW   B'00000001'     ;W = 0x03
+0181   00B3           00530     MOVWF   Y_H             ;Y_H = 0x03
+0182   3068           00531     MOVLW   B'01101000'     ;W = 0xE8
+0183   00B4           00532     MOVWF   Y_L             ;Y_L = 0xE8 
+0184   2???           00533     CALL    SUBTRACAO_16BITS        ;chama rotina de subtração de 16 bits
+0185   19A0           00534     BTFSC   EH_NEGATIVO     ;testa se o resultado da operação deu EH_NEGATIVO
+0186   2???           00535     GOTO    FINALIZA_ESFRIAR   ;se EH_NEGATIVO pula para TRATA_CENTENA
+                      00536     ;AQUECENDO DE AQUECIMENTO
+0187   1487           00537     BSF     COOLER
+0188                  00538 AQUECENDO_DE_RESFRIAMENTO
+0188   2???           00539     CALL    LER_TEMPERATURA
+0189   0841           00540     MOVF    M_TEMP,W
+018A   00A5           00541     MOVWF   MILHAR
+018B   0840           00542     MOVF    C_TEMP,W
+018C   00A4           00543     MOVWF   CENTENA
+018D   083F           00544     MOVF    D_TEMP,W
+018E   00A3           00545     MOVWF   DEZENA
+018F   083E           00546     MOVF    U_TEMP,W
+0190   00A2           00547     MOVWF   UNIDADE
+0191   2???           00548     CALL    ATUALIZA_DISPLAY
+                      00549     ;TESTAR SE VALOR ESTA ABAIXO OU ACIMA DA TEMPERATURA
+0192   0840           00550     MOVF    C_TEMP,W
+0193   023C           00551     SUBWF   C_POT,W
+0194   1D03           00552     BTFSS   STATUS,Z
+0195   2???           00553     GOTO    AQUECENDO_DE_RESFRIAMENTO
+                      00554     ;TESTANDO DEZENA
+0196   083F           00555     MOVF    D_TEMP,W
+0197   023B           00556     SUBWF   D_POT,W
+0198   1D03           00557     BTFSS   STATUS,Z
+0199   2???           00558     GOTO    AQUECENDO_DE_RESFRIAMENTO
+                      00559     ;TESTANDO UNIDADE
+019A   083E           00560     MOVF    U_TEMP,W
+019B   023A           00561     SUBWF   U_POT,W
+019C   1D03           00562     BTFSS   STATUS,Z
+MPASM 5.71              NEWPIC_8B_SIMPLE.ASM   5-7-2024  23:24:58         PAGE 12
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+019D   2???           00563     GOTO    AQUECENDO_DE_RESFRIAMENTO
+019E                  00564 FINALIZA_ESFRIAR
+019E   1087           00565     BCF     COOLER
+019F   178B           00566     BSF     INTCON,GIE
+01A0   168B           00567     BSF     INTCON,T0IE     ;permite atender interrupção por TMR0
+01A1   0008           00568     RETURN
+Warning[205]: Found directive in column 1. (END)
+3F71                  00569 END
+MPASM 5.71              NEWPIC_8B_SIMPLE.ASM   5-7-2024  23:24:58         PAGE 13
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+ACAO                              FLAGS,0
+ACKDT                             00000005
+ACKEN                             00000004
+ACKSTAT                           00000006
+ADCON0                            0000001F
+ADCON1                            0000009F
+ADCS0                             00000006
+ADCS1                             00000007
+ADCS2                             00000006
+ADDEN                             00000003
+ADFM                              00000007
+ADIE                              00000006
+ADIF                              00000006
+ADON                              00000000
+ADRESH                            0000001E
+ADRESL                            0000009E
+AQUECENDO                         FLAGS,5
+AQUECENDO_DE_RESFRIAMENTO         00000188
+ATUALIZA_DISPLAY                  000000C7
+BANK0                             BCF STATUS,RP0
+BANK1                             BSF STATUS,RP0
+BCLIE                             00000003
+BCLIF                             00000003
+BF                                00000000
+BRGH                              00000002
+BUSCA_CODIGO                      000000E9
+B_POT                             PORTB,0
+B_TEMP                            PORTB,1
+C                                 00000000
+C1INV                             00000004
+C1OUT                             00000006
+C2INV                             00000005
+C2OUT                             00000007
+CCP1CON                           00000017
+CCP1IE                            00000002
+CCP1IF                            00000002
+CCP1M0                            00000000
+CCP1M1                            00000001
+CCP1M2                            00000002
+CCP1M3                            00000003
+CCP1X                             00000005
+CCP1Y                             00000004
+CCP2CON                           0000001D
+CCP2IE                            00000000
+CCP2IF                            00000000
+CCP2M0                            00000000
+CCP2M1                            00000001
+CCP2M2                            00000002
+CCP2M3                            00000003
+CCP2X                             00000005
+CCP2Y                             00000004
+CCPR1                             00000015
+CCPR1H                            00000016
+MPASM 5.71              NEWPIC_8B_SIMPLE.ASM   5-7-2024  23:24:58         PAGE 14
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+CCPR1L                            00000015
+CCPR2                             0000001B
+CCPR2H                            0000001C
+CCPR2L                            0000001B
+CENTENA                           00000024
+CHS0                              00000003
+CHS1                              00000004
+CHS2                              00000005
+CIS                               00000003
+CKE                               00000006
+CKP                               00000004
+CM0                               00000000
+CM1                               00000001
+CM2                               00000002
+CMCON                             0000009C
+CMIE                              00000006
+CMIF                              00000006
+CONTADOR                          0000002E
+CONTROLA_AQUECENDO                000000A0
+COOLER                            PORTC,1
+CREN                              00000004
+CSRC                              00000007
+CVR0                              00000000
+CVR1                              00000001
+CVR2                              00000002
+CVR3                              00000003
+CVRCON                            0000009D
+CVREN                             00000007
+CVROE                             00000006
+CVRR                              00000005
+C_POT                             0000003C
+C_TEMP                            00000040
+D                                 00000005
+DATA_ADDRESS                      00000005
+DC                                00000001
+DELAY_ADC                         00000035
+DESLIGA                           PORTB,3
+DESLIGA_AQUECENDO                 000000E6
+DESLIGA_HEATER                    000000AE
+DEZENA                            00000023
+DISPLAY                           PORTD
+D_A                               00000005
+D_CENTENA                         PORTB,6
+D_DEZENA                          PORTB,5
+D_MILHAR                          PORTB,7
+D_NOT_A                           00000005
+D_POT                             0000003B
+D_TEMP                            0000003F
+D_UNIDADE                         PORTB,4
+EEADR                             0000010D
+EEADRH                            0000010F
+EECON1                            0000018C
+EECON2                            0000018D
+MPASM 5.71              NEWPIC_8B_SIMPLE.ASM   5-7-2024  23:24:58         PAGE 15
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+EEDATA                            0000010C
+EEDATH                            0000010E
+EEIE                              00000004
+EEIF                              00000004
+EEPGD                             00000007
+EH_NEGATIVO                       FLAGS,3
+EXTRAI_CENTENA                    00000085
+EXTRAI_CENTENA_POT                0000014B
+EXTRAI_CENTENA_TEMP               00000112
+EXTRAI_DEZENA                     00000096
+EXTRAI_DEZENA_POT                 0000015D
+EXTRAI_DEZENA_TEMP                00000124
+EXTRAI_MILHAR                     00000074
+EXTRAI_MILHAR_POT                 00000139
+EXTRAI_MILHAR_TEMP                00000100
+EXTRAI_UNIDADE                    0000009D
+E_EH_NEGATIVO                     000000C5
+E_POSITIVO_MSB                    000000BD
+F                                 00000001
+FERR                              00000002
+FILTRO                            00000021
+FIM_TEMPO                         FLAGS,2
+FINALIZA_ESFRIAR                  0000019E
+FLAGS                             00000020
+FSR                               00000004
+GCEN                              00000007
+GIE                               00000007
+GO                                00000002
+GO_DONE                           00000002
+GO_NOT_DONE                       00000002
+HEATER                            PORTC,2
+H_POTENCIOMETRO                   00000036
+H_TEMPERATURA                     00000038
+I2C_DATA                          00000005
+I2C_READ                          00000002
+I2C_START                         00000003
+I2C_STOP                          00000004
+IBF                               00000007
+IBOV                              00000005
+INDF                              00000000
+INTCON                            0000000B
+INTE                              00000004
+INTEDG                            00000006
+INTF                              00000001
+INT_ATIVA                         FLAGS,1
+IRP                               00000007
+LACO_PRINCIPAL                    00000039
+LER_POTENCIOMETRO                 0000012E
+LER_TEMPERATURA                   000000F5
+LIGA                              PORTB,2
+L_POTENCIOMETRO                   00000037
+L_TEMPERATURA                     00000039
+MILHAR                            00000025
+MPASM 5.71              NEWPIC_8B_SIMPLE.ASM   5-7-2024  23:24:58         PAGE 16
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+MOSTRA_CANAL_0                    0000006C
+MOSTRA_CANAL_1                    00000067
+MOSTRA_NO_DISPLAY                 00000070
+M_POT                             0000003D
+M_TEMP                            00000041
+NOT_A                             00000005
+NOT_ADDRESS                       00000005
+NOT_BO                            00000000
+NOT_BOR                           00000000
+NOT_DONE                          00000002
+NOT_PD                            00000003
+NOT_POR                           00000001
+NOT_RBPU                          00000007
+NOT_RC8                           00000006
+NOT_T1SYNC                        00000002
+NOT_TO                            00000004
+NOT_TX8                           00000006
+NOT_W                             00000002
+NOT_WRITE                         00000002
+OBF                               00000006
+OERR                              00000001
+OPTION_REG                        00000081
+P                                 00000004
+PCFG0                             00000000
+PCFG1                             00000001
+PCFG2                             00000002
+PCFG3                             00000003
+PCL                               00000002
+PCLATH                            0000000A
+PCON                              0000008E
+PEIE                              00000006
+PEN                               00000002
+PIE1                              0000008C
+PIE2                              0000008D
+PIR1                              0000000C
+PIR2                              0000000D
+PORTA                             00000005
+PORTB                             00000006
+PORTC                             00000007
+PORTD                             00000008
+PORTE                             00000009
+PR2                               00000092
+PS0                               00000000
+PS1                               00000001
+PS2                               00000002
+PSA                               00000003
+PSPIE                             00000007
+PSPIF                             00000007
+PSPMODE                           00000004
+QUAL_CANAL                        FLAGS,4
+R                                 00000002
+RA0                               00000000
+RA1                               00000001
+MPASM 5.71              NEWPIC_8B_SIMPLE.ASM   5-7-2024  23:24:58         PAGE 17
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+RA2                               00000002
+RA3                               00000003
+RA4                               00000004
+RA5                               00000005
+RB0                               00000000
+RB1                               00000001
+RB2                               00000002
+RB3                               00000003
+RB4                               00000004
+RB5                               00000005
+RB6                               00000006
+RB7                               00000007
+RBIE                              00000003
+RBIF                              00000000
+RC0                               00000000
+RC1                               00000001
+RC2                               00000002
+RC3                               00000003
+RC4                               00000004
+RC5                               00000005
+RC6                               00000006
+RC7                               00000007
+RC8_9                             00000006
+RC9                               00000006
+RCD8                              00000000
+RCEN                              00000003
+RCIE                              00000005
+RCIF                              00000005
+RCREG                             0000001A
+RCSTA                             00000018
+RD                                00000000
+RD0                               00000000
+RD1                               00000001
+RD2                               00000002
+RD3                               00000003
+RD4                               00000004
+RD5                               00000005
+RD6                               00000006
+RD7                               00000007
+RE0                               00000000
+RE1                               00000001
+RE2                               00000002
+READ_WRITE                        00000002
+RESFRIAMENTO_30GRAUS              00000167
+RP0                               00000005
+RP1                               00000006
+RSEN                              00000001
+RX9                               00000006
+RX9D                              00000000
+R_H                               0000002F
+R_L                               00000030
+R_NOT_W                           00000002
+R_W                               00000002
+MPASM 5.71              NEWPIC_8B_SIMPLE.ASM   5-7-2024  23:24:58         PAGE 18
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+S                                 00000003
+SAI_INTERRUPCAO                   00000012
+SEN                               00000000
+SMP                               00000007
+SPBRG                             00000099
+SPEN                              00000007
+SREN                              00000005
+SSPADD                            00000093
+SSPBUF                            00000013
+SSPCON                            00000014
+SSPCON2                           00000091
+SSPEN                             00000005
+SSPIE                             00000003
+SSPIF                             00000003
+SSPM0                             00000000
+SSPM1                             00000001
+SSPM2                             00000002
+SSPM3                             00000003
+SSPOV                             00000006
+SSPSTAT                           00000094
+START                             00000016
+STATUS                            00000003
+SUBTRACAO_16BITS                  000000B0
+SYNC                              00000004
+S_TEMP                            00000027
+T0CS                              00000005
+T0IE                              00000005
+T0IF                              00000002
+T0SE                              00000004
+T1CKPS0                           00000004
+T1CKPS1                           00000005
+T1CON                             00000010
+T1INSYNC                          00000002
+T1OSCEN                           00000003
+T1SYNC                            00000002
+T2CKPS0                           00000000
+T2CKPS1                           00000001
+T2CON                             00000012
+TESTA_DISPLAY_CENTENA             000000D8
+TESTA_DISPLAY_DEZENA              000000D0
+TESTA_DISPLAY_MILHAR              000000E0
+TMR0                              00000001
+TMR0IE                            00000005
+TMR0IF                            00000002
+TMR1                              0000000E
+TMR1CS                            00000001
+TMR1H                             0000000F
+TMR1IE                            00000000
+TMR1IF                            00000000
+TMR1L                             0000000E
+TMR1ON                            00000000
+TMR2                              00000011
+TMR2IE                            00000001
+MPASM 5.71              NEWPIC_8B_SIMPLE.ASM   5-7-2024  23:24:58         PAGE 19
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+TMR2IF                            00000001
+TMR2ON                            00000002
+TOUTPS0                           00000003
+TOUTPS1                           00000004
+TOUTPS2                           00000005
+TOUTPS3                           00000006
+TRATA_CENTENA_POT                 0000014A
+TRATA_CENTENA_TEMP                00000111
+TRATA_DEZENA_POT                  0000015C
+TRATA_DEZENA_TEMP                 00000123
+TRATA_UNIDADE_POT                 00000164
+TRATA_UNIDADE_TEMP                0000012B
+TRISA                             00000085
+TRISA0                            00000000
+TRISA1                            00000001
+TRISA2                            00000002
+TRISA3                            00000003
+TRISA4                            00000004
+TRISA5                            00000005
+TRISB                             00000086
+TRISB0                            00000000
+TRISB1                            00000001
+TRISB2                            00000002
+TRISB3                            00000003
+TRISB4                            00000004
+TRISB5                            00000005
+TRISB6                            00000006
+TRISB7                            00000007
+TRISC                             00000087
+TRISC0                            00000000
+TRISC1                            00000001
+TRISC2                            00000002
+TRISC3                            00000003
+TRISC4                            00000004
+TRISC5                            00000005
+TRISC6                            00000006
+TRISC7                            00000007
+TRISD                             00000088
+TRISD0                            00000000
+TRISD1                            00000001
+TRISD2                            00000002
+TRISD3                            00000003
+TRISD4                            00000004
+TRISD5                            00000005
+TRISD6                            00000006
+TRISD7                            00000007
+TRISE                             00000089
+TRISE0                            00000000
+TRISE1                            00000001
+TRISE2                            00000002
+TRMT                              00000001
+TX8_9                             00000006
+TX9                               00000006
+MPASM 5.71              NEWPIC_8B_SIMPLE.ASM   5-7-2024  23:24:58         PAGE 20
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+TX9D                              00000000
+TXD8                              00000000
+TXEN                              00000005
+TXIE                              00000004
+TXIF                              00000004
+TXREG                             00000019
+TXSTA                             00000098
+UA                                00000001
+UNIDADE                           00000022
+U_POT                             0000003A
+U_TEMP                            0000003E
+VALOR_ADC0_H                      0000002A
+VALOR_ADC0_L                      0000002B
+VALOR_ADC1_H                      0000002C
+VALOR_ADC1_L                      0000002D
+VALOR_ADC_H                       00000028
+VALOR_ADC_L                       00000029
+V_CONT                            00000004
+V_FILTRO                          00000064
+V_TMR0                            00000006
+W                                 00000000
+WCOL                              00000007
+WR                                00000001
+WREN                              00000002
+WRERR                             00000003
+W_TEMP                            00000026
+X_H                               00000031
+X_L                               00000032
+Y_H                               00000033
+Y_L                               00000034
+Z                                 00000002
+_BODEN_OFF                        00003FBF
+_BODEN_ON                         00003FFF
+_BOREN_OFF                        00003FBF
+_BOREN_ON                         00003FFF
+_CONFIG                           00002007
+_CPD_OFF                          00003FFF
+_CPD_ON                           00003EFF
+_CP_ALL                           00001FFF
+_CP_OFF                           00003FFF
+_CP_ON                            00001FFF
+_DEBUG_OFF                        00003FFF
+_DEBUG_ON                         000037FF
+_DEVID1                           00002006
+_FOSC_EXTRC                       00003FFF
+_FOSC_HS                          00003FFE
+_FOSC_LP                          00003FFC
+_FOSC_XT                          00003FFD
+_HS_OSC                           00003FFE
+_IDLOC0                           00002000
+_IDLOC1                           00002001
+_IDLOC2                           00002002
+_IDLOC3                           00002003
+MPASM 5.71              NEWPIC_8B_SIMPLE.ASM   5-7-2024  23:24:58         PAGE 21
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_INTERRUPT_VECT_004B              0000004B
+_INTERRUPT_VECT_004E              0000004E
+_INTERRUPT_VECT_0059              00000059
+_INTERRUPT_VECT_005C              0000005C
+_INTERRUPT_VECT_00F8              000000F8
+_INTERRUPT_VECT_0131              00000131
+_INTERRUPT_VECT_0175              00000175
+_LP_OSC                           00003FFC
+_LVP_OFF                          00003F7F
+_LVP_ON                           00003FFF
+_PWRTE_OFF                        00003FFF
+_PWRTE_ON                         00003FF7
+_RC_OSC                           00003FFF
+_WDTE_OFF                         00003FFB
+_WDTE_ON                          00003FFF
+_WDT_OFF                          00003FFB
+_WDT_ON                           00003FFF
+_WRT_1FOURTH                      00003BFF
+_WRT_256                          00003DFF
+_WRT_HALF                         000039FF
+_WRT_OFF                          00003FFF
+_XT_OSC                           00003FFD
+__16F877A                         00000001
+
+Errors   :     0
+Warnings :     1 reported,     0 suppressed
+Messages :    11 reported,     0 suppressed
+
+

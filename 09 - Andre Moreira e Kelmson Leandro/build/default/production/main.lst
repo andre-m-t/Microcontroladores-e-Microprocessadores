@@ -1,0 +1,958 @@
+MPASM 5.71                          MAIN.ASM   5-14-2024  23:05:01         PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00001 ; PIC16F877A Configuration Bit Settings
+                      00002 ; Assembly source line config statements
+                      00003 #include "p16f877a.inc"
+                      00001         LIST
+                      00002 
+                      00003 ;==========================================================================
+                      00004 ; Build date : Nov 17 2016
+                      00005 ;  MPASM PIC16F877A processor include
+                      00006 ; 
+                      00007 ;  (c) Copyright 1999-2016 Microchip Technology, All rights reserved
+                      00008 ;==========================================================================
+                      00009 
+                      00567         LIST
+                      00004 ; CONFIG
+                      00005 ; __config 0xFF72
+2007   3F72           00006  __CONFIG _FOSC_HS & _WDTE_OFF & _PWRTE_ON & _BOREN_ON & _LVP_OFF & _CPD_OFF & _WRT_OFF & _CP_OFF
+                      00007     
+                      00008 #define BANK0   BCF STATUS,RP0
+                      00009 #define BANK1   BSF STATUS,RP0
+                      00010  
+                      00011  CBLOCK 0x20
+  00000020            00012     UNIDADE     ;0x20
+  00000021            00013     DEZENA      ;0x21
+  00000022            00014     CENTENA     ;0x22
+  00000023            00015     MILHAR      ;0x23
+  00000024            00016     FLAGS       ;0x24
+  00000025            00017     FLAGS2      ;0X25
+  00000026            00018     CONTADOR    ;0x26
+  00000027            00019     W_TEMP      ;0x27
+  00000028            00020     S_TEMP      ;0x28
+  00000029            00021     VALOR_ADC   ;0x29
+  0000002A            00022     CONTADOR2   ;0x30
+  0000002B            00023     VALOR_SP    ;0x31
+  0000002C            00024     VALOR_PV    ;0x32   
+  0000002D            00025     HISTERESE   ;0X33
+  0000002E            00026     FILTRO1     ;0x34
+  0000002F            00027     FILTRO2     ;0x35
+  00000030            00028     FILTRO3     ;0x36
+  00000031            00029     FILTRO4     ;0x37
+                      00030  ENDC
+                      00031  
+                      00032 ;variaveis bool
+                      00033 #define FIM_TEMPO   FLAGS,0
+                      00034 #define INT_ATIVA   FLAGS,1
+                      00035 #define QUAL_CANAL  FLAGS,2
+                      00036 #define PROCESSO    FLAGS,3 
+                      00037 #define ACAO1       FLAGS,4
+                      00038 #define ACAO2       FLAGS,5
+                      00039 #define ACAO3       FLAGS,6
+                      00040 #define ACAO4       FLAGS,7
+                      00041 #define MOSTRA_HIST FLAGS2,0
+                      00042  
+                      00043  
+MPASM 5.71                          MAIN.ASM   5-14-2024  23:05:01         PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00044 ;entradas
+                      00045 #define B_LG_DSLG               PORTB,0
+                      00046 #define B_MOSTRA_INFO       PORTB,1
+                      00047 #define B_INC_HIST          PORTB,2
+                      00048 #define B_DEC_HIST          PORTB,3 
+                      00049  
+                      00050 ;saidas
+                      00051 #define DISPLAY     PORTD
+                      00052 #define D_UNIDADE           PORTB,4
+                      00053 #define D_DEZENA            PORTB,5
+                      00054 #define D_CENTENA           PORTB,6
+                      00055 #define D_MILHAR            PORTB,7
+                      00056 #define HEATER      PORTC,2
+                      00057  
+                      00058 ;constantes
+  000000FA            00059 V_CONT         equ         .250 
+  00000083            00060 V_TMR0         equ         .131
+  00000032            00061 V_FILTRO       equ         .50 
+                      00062     
+                      00063 RES_VECT  CODE    0x0000            ; processor reset vector
+0000   2???           00064     GOTO    START                   ; go to beginning of program
+                      00065 
+                      00066 ISR       CODE    0x0004           ; interrupt vector location
+0004   00A7           00067     MOVWF   W_TEMP          ;salva o W na mem ria RAM
+0005   0803           00068     MOVF    STATUS,W        ;carrega o STATUS em W
+0006   00A8           00069     MOVWF   S_TEMP          ;e salva na mem ria RAM
+0007   1D0B           00070     BTFSS   INTCON,T0IF     ;verifica se a interrup  o foi por TIMER0
+0008   2???           00071     GOTO    SAI_INTERRUPCAO ;se n o foi v  para SAI_INTERRUPCAO
+0009   110B           00072     BCF     INTCON,T0IF     ;se sim, limpa bit indicador de interrup  o
+000A   3083           00073     MOVLW   V_TMR0                  ;carrega 6 em W para ajustar 25 pulsos no TMR0
+000B   0781           00074     ADDWF   TMR0,F          ;soma 6 no TMR0 para que conte 250 pulsos
+000C   14A4           00075     BSF     INT_ATIVA       ;ativa indica de evento a cada 4ms
+000D   0BA6           00076     DECFSZ  CONTADOR,F      ;decremente o CONTADOR e verifique se zerou
+000E   2???           00077     GOTO    SAI_INTERRUPCAO ;se n o zerou, v  para SAI_INTERRUPCAO
+000F   30FA           00078     MOVLW   V_CONT          ;move para o valor da constante
+0010   00A6           00079     MOVWF   CONTADOR        ;inicializa o CONTADOR
+0011   1424           00080     BSF     FIM_TEMPO       ;seta a vari vel booleana para pedir a leitura do ADC
+0012                  00081 SAI_INTERRUPCAO
+0012   0828           00082     MOVF    S_TEMP,W        ;carrega o S_TEMP em W
+0013   0083           00083     MOVWF   STATUS          ;restaura STATUS
+0014   0827           00084     MOVF    W_TEMP,W        ;restaura W    
+0015   0009           00085     RETFIE
+                      00086 
+0016                  00087 START
+0016   1683           00088     BANK1                   ;seleciona o banco 1 da mem ria de RAM
+0017   1107           00089     BCF     HEATER          ;sa da para acionar a resist ncia
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0018   0188           00090     CLRF    TRISD           ;zera o TRISB e faz com que todo o PORTD torne-se sa da
+0019   300F           00091     MOVLW   B'00001111'     ;
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+001A   0086           00092     MOVWF   TRISB           ;configura os 4 bits MSB como sa da
+001B   30D3           00093     MOVLW   B'11010011'     ;carrega o valor de configura do TMR0 em W
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+MPASM 5.71                          MAIN.ASM   5-14-2024  23:05:01         PAGE  3
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+001C   0081           00094     MOVWF   OPTION_REG      ;configura o TMR0
+001D   3044           00095     MOVLW   B'01000100'     ;carrega o valor de configura  o do ADCON1 em W
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+001E   009F           00096     MOVWF   ADCON1
+001F   1283           00097     BANK0                   ;seleciona o banco 0 da mem ria de RAM
+0020   30C1           00098     MOVLW   B'11000001'     ;carrega o valor de configura  o do ADCON1 em W
+0021   009F           00099     MOVWF   ADCON0
+0022   01A0           00100     CLRF    UNIDADE         ;UNIDADE = 0
+0023   01A1           00101     CLRF    DEZENA          ;DEZENA = 0
+0024   01A2           00102     CLRF    CENTENA         ;CENTENA = 0
+0025   01A3           00103     CLRF    MILHAR          ;MILHAR  = 0
+0026   01A4           00104     CLRF    FLAGS           ;limpa todos os flags (booleanas)
+0027   0186           00105     CLRF    PORTB           ;limpa o PORTB
+0028   0188           00106     CLRF    PORTD           ;limpa o PORTD
+0029   1107           00107     BCF     HEATER          ;desliga a resist ncia
+002A   3005           00108     MOVLW   .5              ;colocando valor 5 para iniciarmos a histerese com esse valor
+002B   00AD           00109     MOVWF   HISTERESE       ;carrega esse valor na vari vel histerese
+002C   307D           00110     MOVLW   .125            ;carrega 125 em W
+002D   00AA           00111     MOVWF   CONTADOR2       ;carrega 125 no CONTADOR2
+002E   168B           00112     BSF     INTCON,T0IE     ;habilita as interrup  es por TIMER0
+002F   178B           00113     BSF     INTCON,GIE      ;habilita a chave geral de interrup es
+                      00114 
+0030                  00115 LACO_PRINCIPAL  
+0030   18A4           00116     BTFSC   INT_ATIVA                   ;TESTA SE ENTROU NA INTERRUPCAO
+0031   2???           00117     CALL    ATUALIZA_DISPLAY            ;SE SIM ATUALIZA DISPLAY
+0032   1824           00118     BTFSC   FIM_TEMPO                   ;TESTA SE PASSOU TEMPO
+0033   2???           00119     CALL    LEITURA_ADC                 ;SE SIM LE ENTRADAS ANALOGICAS
+0034   1C06           00120     BTFSS   B_LG_DSLG                   ;TESTA BOTAO ON/OFF
+0035   2???           00121     GOTO    B_LG_DSLG_PRESS             ;VAI PARA ON/OFF PRESS
+0036   2???           00122     CALL    RESETA_FILTRO1              ;RESET DE FILTRO
+0037                  00123 TESTA_B_INFO
+0037   1C86           00124     BTFSS   B_MOSTRA_INFO               ;TESTA SE BOTAO MOSTRA INFO FOI SELECIONADO
+0038   2???           00125     GOTO    B_MOSTRA_INFO_PRESS         ;VAI PARA B_MOSTRA_INFO_PRESS
+0039   2???           00126     CALL    RESETA_FILTRO2              ;RESET DE FILTRO
+003A   1DA4           00127     BTFSS   PROCESSO                    ;VERIFICA PROCESSO ATIVO
+003B   2???           00128     CALL    CHECK_B_HIST                ;SE NAO ESTIVER ATIVO VAI PARA CHECK_B_HIST
+003C   2???           00129     GOTO    LACO_PRINCIPAL              ;RETORNA AO LACO PRINCIPAL   
+                      00130 
+                      00131 
+003D                  00132 LEITURA_ADC    
+003D   1024           00133     BCF     FIM_TEMPO               ;LIMPA FIM TEMPO
+003E   119F           00134     BCF     ADCON0,3                ;slecionar canal 0 (PV - VARIAVEL DE PROCESSO)
+003F   2???           00135     CALL    DELAY_TROCA_CANAL       ;CHAMA FUNCAO DE DELAY PARA TROCA DE CANAL
+0040   151F           00136     BSF     ADCON0,GO_DONE          ;ativa a convers o
+0041   191F           00137     BTFSC   ADCON0,GO_DONE          ;testa se a convers o foi feita
+0042   2???           00138     GOTO    $-1                     ;se n o acabou, testa de novo
+0043   081E           00139     MOVF    ADRESH,W                ;l  os 8bits (MSB) da convers o e carrega em W    
+0044   00AC           00140     MOVWF   VALOR_PV                ;carrega o valor do sensor 
+0045                  00141 CANAL_SP
+0045   159F           00142     BSF     ADCON0,3                ;seleciona canal 1: bits 5,4,3 = 001
+0046   2???           00143     CALL    DELAY_TROCA_CANAL       ;CHAMA FUNCAO DE DELAY PARA TROCA DE CANAL
+0047   151F           00144     BSF     ADCON0,GO_DONE          ;ativa a convers o
+0048   191F           00145     BTFSC   ADCON0,GO_DONE          ;testa se a convers o foi feita
+MPASM 5.71                          MAIN.ASM   5-14-2024  23:05:01         PAGE  4
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0049   2???           00146     GOTO    $-1                     ;se n o acabou, testa de novo
+004A   081E           00147     MOVF    ADRESH,W                ;l  os 8bits (MSB) da convers o e carrega em W  
+004B   00AB           00148     MOVWF   VALOR_SP                ;carrega o valor do set-point 
+004C   2???           00149     CALL    COMPARA_POT_MIN         ;LIMITANDO POTENCIOMETRO
+004D   2???           00150     CALL    COMPARA_POT_MAX         ;FUNCAO PARA LIMITAR POT
+004E   1825           00151     BTFSC   MOSTRA_HIST             ;TESTA SE FLAG INDICADOR DE MOSTRA HISTERESE ESTA ATIVO
+004F   2???           00152     GOTO    MOSTRAR_HIST            ;VAI PARA MOSTRA HISTERESE
+0050   1D24           00153     BTFSS   QUAL_CANAL              ;TESTA QUAL CANAL
+0051   2???           00154     GOTO    CARREGA_SP_VALOR        
+0052   082C           00155     MOVF    VALOR_PV,W         
+0053                  00156 EXTRAI_VALOR  
+0053   00A9           00157     MOVWF   VALOR_ADC       ;carrega o valor convertrido em VALOR_ADC
+0054   01A2           00158     CLRF    CENTENA         ;zera a CENTENA
+0055   01A1           00159     CLRF    DEZENA          ;zera a DEZENA
+0056                  00160 EXTRAI_CENTENA
+0056   3064           00161     MOVLW   .100            ;carrega 100 (1 centena) para comparar com VALOR_ADC
+0057   0229           00162     SUBWF   VALOR_ADC,W     ;subtrai 100 de VALOR_ADC
+0058   1C03           00163     BTFSS   STATUS,C        ;verifica se o resultado   negativo
+0059   2???           00164     GOTO    EXTRAI_DEZENA    ;se for, pula para testa DEZENA
+005A   00A9           00165     MOVWF   VALOR_ADC       ;se n o, carrega da subtra  o em VALOR_ADC
+005B   0AA2           00166     INCF    CENTENA,F       ;incrementa CENTENA
+005C   2???           00167     GOTO    EXTRAI_CENTENA   ;testa de novo se o n mero   maior que 100
+005D                  00168 EXTRAI_DEZENA
+005D   300A           00169     MOVLW   .10             ;carrega 10 (1 dezena) para comparar com VALOR_ADC
+005E   0229           00170     SUBWF   VALOR_ADC,W     ;subtrai 10 de VALOR_ADC
+005F   1C03           00171     BTFSS   STATUS,C        ;verifica se o resultado   negativo
+0060   2???           00172     GOTO    EXTRAI_UNIDADE   ;se for, pula para testa UNIDADE
+0061   00A9           00173     MOVWF   VALOR_ADC       ;se n o, carrega da subtra  o em VALOR_ADC
+0062   0AA1           00174     INCF    DEZENA,F        ;incrementa DEZENA
+0063   2???           00175     GOTO    EXTRAI_DEZENA    ;testa de novo se o n mero   maior que 10    
+0064                  00176 EXTRAI_UNIDADE
+0064   0829           00177     MOVF    VALOR_ADC,W     
+0065   00A0           00178     MOVWF   UNIDADE         
+0066   1DA4           00179     BTFSS   PROCESSO        
+0067   2???           00180     GOTO    LACO_PRINCIPAL  
+0068   082B           00181     MOVF    VALOR_SP,W      
+0069   072D           00182     ADDWF   HISTERESE,W
+006A   022C           00183     SUBWF   VALOR_PV,W      
+006B   1C03           00184     BTFSS   STATUS,C        
+006C   2???           00185     GOTO    EH_NEGATIVO     
+006D   1107           00186     BCF     HEATER          
+006E   2???           00187     GOTO    LACO_PRINCIPAL  
+                      00188     
+006F                  00189 EH_NEGATIVO
+006F   082C           00190     MOVF    VALOR_PV, W     
+0070   072D           00191     ADDWF   HISTERESE,W     
+0071   022B           00192     SUBWF   VALOR_SP, W     
+0072   1C03           00193     BTFSS   STATUS,C         
+0073   2???           00194     GOTO    LACO_PRINCIPAL
+0074   1507           00195     BSF     HEATER          
+0075   2???           00196     GOTO    LACO_PRINCIPAL  ;v  para o LACO _PRINCIPAL
+                      00197 
+                      00198 
+MPASM 5.71                          MAIN.ASM   5-14-2024  23:05:01         PAGE  5
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0076                  00199 MOSTRAR_HIST
+0076   082D           00200     MOVF    HISTERESE,W
+0077   2???           00201     GOTO    EXTRAI_VALOR    
+0078                  00202 CARREGA_SP_VALOR
+0078   082B           00203     MOVF    VALOR_SP,W  
+0079   2???           00204     GOTO    EXTRAI_VALOR     
+                      00205 
+                      00206 
+007A                  00207 DESLIGA_PRESS
+007A   11A4           00208     BCF     PROCESSO        ;
+007B   1107           00209     BCF     HEATER          ;DESLIGA AQUECEDOR
+007C   2???           00210     GOTO    TESTA_B_INFO            ;pula para TESTA_B_INFO    
+                      00211 
+007D                  00212 ATUALIZA_DISPLAY
+007D   10A4           00213     BCF     INT_ATIVA       ;limpa o indicador de fim de tempo
+007E   1E06           00214     BTFSS   D_UNIDADE               ;verifica se o display da UNIDADE est  aceso
+007F   2???           00215     GOTO    TESTA_DEZENA            ;se n o estiver, pula e acende TESTA_D_D
+0080   1206           00216     BCF     D_UNIDADE               ;apapar o display da UNIDADE
+0081   0821           00217     MOVF    DEZENA,W        ;carrega a DEZENA em W
+0082   2???           00218     CALL    BUSCA_CODIGO            ;chama a sub-rotina para o c digo display
+0083   0088           00219     MOVWF   DISPLAY         ;escreve o valor no DISPLAY
+0084   1686           00220     BSF     D_DEZENA                ;acende display DEZENA    
+0085   0008           00221     RETURN
+                      00222     
+0086                  00223 TESTA_DEZENA
+0086   1E86           00224     BTFSS   D_DEZENA                ;verifica se o display da DEZENA est  aceso
+0087   2???           00225     GOTO    TESTA_CENTENA           ;se n o estiver, pula e acende TESTA_D_C
+0088   1286           00226     BCF     D_DEZENA                ;apapar o display da DEZENA
+0089   0822           00227     MOVF    CENTENA,W       ;carrega a CENTENA em W
+008A   2???           00228     CALL    BUSCA_CODIGO            ;chama a sub-rotina para o c digo display 
+008B   0088           00229     MOVWF   DISPLAY         ;escreve o valor no DISPLAY
+008C   1706           00230     BSF     D_CENTENA       ;acende display CENTENA    
+008D   0008           00231     RETURN
+008E                  00232 TESTA_CENTENA    
+008E   1F06           00233     BTFSS   D_CENTENA               ;verifica se o display da CENTENA est  aceso
+008F   2???           00234     GOTO    TESTA_UNIDADE           ;se n o estiver, pula e acende TESTA_D_M
+0090   1306           00235     BCF     D_CENTENA               ;apapar o display da CENTENA
+0091   0823           00236     MOVF    MILHAR,W                ;carrega a MILHAR em W    
+0092   1825           00237     BTFSC   MOSTRA_HIST     
+0093   2???           00238     GOTO    MOSTRAR_HISTERESE
+0094   1D24           00239     BTFSS   QUAL_CANAL
+0095   2???           00240     GOTO    MOSTRAR_POTENCIOMETRO
+0096   2???           00241     GOTO    MOSTRAR_TEMPERATURA
+0097   2???           00242     CALL    MOSTRA_VAR
+0098                  00243 TESTA_UNIDADE    
+0098   1386           00244     BCF     D_MILHAR                ;apapar o display da MILHAR
+0099   0820           00245     MOVF    UNIDADE,W       ;carrega a UNIDADE em W
+009A   2???           00246     CALL    BUSCA_CODIGO            ;chama a sub-rotina para o c digo display 
+009B   0088           00247     MOVWF   DISPLAY         ;escreve o valor no DISPLAY
+009C   1606           00248     BSF     D_UNIDADE               ;acende display UNIDADE    
+009D   0008           00249     RETURN       
+009E                  00250 MOSTRAR_HISTERESE
+009E   3000           00251     MOVLW   .0 ;-> H -> histerese
+MPASM 5.71                          MAIN.ASM   5-14-2024  23:05:01         PAGE  6
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+009F   2???           00252     CALL    MOSTRA_VAR
+00A0   0008           00253     RETURN
+00A1                  00254 MOSTRAR_POTENCIOMETRO
+00A1   3001           00255     MOVLW   .1 ;-> S(SetPoint) -> Potenciometro 
+00A2   2???           00256     CALL    MOSTRA_VAR
+00A3   0008           00257     RETURN
+00A4                  00258 MOSTRAR_TEMPERATURA
+00A4   3002           00259     MOVLW   .2  ;-> P(Process) -> Temperatura   
+00A5   2???           00260     CALL    MOSTRA_VAR
+00A6   0008           00261     RETURN
+00A7                  00262 MOSTRA_VAR
+00A7   2???           00263     CALL    BUSCA_CODIGO_VAR
+00A8   1786           00264     BSF     D_MILHAR
+00A9   0088           00265     MOVWF   DISPLAY
+00AA   0008           00266     RETURN
+00AB                  00267 BUSCA_CODIGO_VAR
+00AB   0782           00268     ADDWF       PCL,F
+00AC   3476           00269     RETLW       B'01110110'     ;-> H -> histerese
+00AD   346D           00270     RETLW       B'01101101'     ;-> S(SetPoint) -> Potenciometro
+00AE   3473           00271     RETLW       B'01110011'     ;-> P(Process) -> Temperatura
+                      00272 
+00AF                  00273 BUSCA_CODIGO
+00AF   0782           00274     ADDWF       PCL,F
+00B0   343F           00275     RETLW       .63
+00B1   3406           00276     RETLW       .6
+00B2   345B           00277     RETLW       .91
+00B3   344F           00278     RETLW       .79
+00B4   3466           00279     RETLW       .102
+00B5   346D           00280     RETLW       .109  
+00B6   347D           00281     RETLW       .125
+00B7   3407           00282     RETLW       .7
+00B8   347F           00283     RETLW       .127
+00B9   346F           00284     RETLW       .111
+                      00285 
+00BA                  00286 B_LG_DSLG_PRESS
+00BA   1A24           00287     BTFSC   ACAO1
+00BB   2???           00288     GOTO    LACO_PRINCIPAL
+00BC   0BAE           00289     DECFSZ  FILTRO1,F
+00BD   2???           00290     GOTO    LACO_PRINCIPAL
+00BE   1624           00291     BSF     ACAO1
+00BF   19A4           00292     BTFSC   PROCESSO
+00C0   2???           00293     GOTO    DESLIGA_PRESS
+00C1   15A4           00294     BSF     PROCESSO
+00C2   2???           00295     GOTO    LACO_PRINCIPAL
+00C3                  00296 RESETA_FILTRO1
+00C3   3032           00297     MOVLW   V_FILTRO
+00C4   00AE           00298     MOVWF   FILTRO1
+00C5   1224           00299     BCF     ACAO1
+00C6   0008           00300     RETURN
+                      00301 
+00C7                  00302 B_MOSTRA_INFO_PRESS
+00C7   1AA4           00303     BTFSC   ACAO2
+00C8   2???           00304     GOTO    LACO_PRINCIPAL
+MPASM 5.71                          MAIN.ASM   5-14-2024  23:05:01         PAGE  7
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+00C9   0BAF           00305     DECFSZ  FILTRO2,F
+00CA   2???           00306     GOTO    LACO_PRINCIPAL
+00CB   16A4           00307     BSF     ACAO2
+00CC   1825           00308     BTFSC   MOSTRA_HIST
+00CD   2???           00309     GOTO    TROCA_P_SP
+00CE   1D24           00310     BTFSS   QUAL_CANAL
+00CF   2???           00311     GOTO    TROCA_P_PV
+00D0   1425           00312     BSF     MOSTRA_HIST
+00D1   2???           00313     GOTO    LACO_PRINCIPAL
+00D2                  00314 RESETA_FILTRO2
+00D2   3032           00315     MOVLW   V_FILTRO
+00D3   00AF           00316     MOVWF   FILTRO2
+00D4   12A4           00317     BCF     ACAO2
+00D5   0008           00318     RETURN
+                      00319 
+00D6                  00320 B_INC_HIST_PRESS   
+00D6   1B24           00321     BTFSC   ACAO3
+00D7   2???           00322     GOTO    LACO_PRINCIPAL
+00D8   0BB0           00323     DECFSZ  FILTRO3,F
+00D9   2???           00324     GOTO    LACO_PRINCIPAL
+00DA   1724           00325     BSF     ACAO3
+00DB   2???           00326     CALL    INCREMENTAR_HIST
+00DC   2???           00327     GOTO    LACO_PRINCIPAL
+00DD                  00328 RESETA_FILTRO3
+00DD   3032           00329     MOVLW   V_FILTRO
+00DE   00B0           00330     MOVWF   FILTRO3
+00DF   1324           00331     BCF     ACAO3
+00E0   0008           00332     RETURN
+                      00333     
+00E1                  00334 B_DEC_HIST_PRESS   
+00E1   1BA4           00335     BTFSC   ACAO4
+00E2   2???           00336     GOTO    LACO_PRINCIPAL
+00E3   0BB1           00337     DECFSZ  FILTRO4,F
+00E4   2???           00338     GOTO    LACO_PRINCIPAL
+00E5   17A4           00339     BSF     ACAO4
+00E6   2???           00340     CALL    DECREMENTAR_HIST
+00E7   2???           00341     GOTO    LACO_PRINCIPAL
+00E8                  00342 RESETA_FILTRO4
+00E8   3032           00343     MOVLW   V_FILTRO
+00E9   00B1           00344     MOVWF   FILTRO4
+00EA   13A4           00345     BCF     ACAO4
+00EB   0008           00346     RETURN
+                      00347 
+00EC                  00348 CHECK_B_HIST
+00EC   1C25           00349     BTFSS   MOSTRA_HIST
+00ED   0008           00350     RETURN
+00EE   1D06           00351     BTFSS   B_INC_HIST
+00EF   2???           00352     GOTO    B_INC_HIST_PRESS
+00F0   2???           00353     CALL    RESETA_FILTRO3
+00F1   1D86           00354     BTFSS   B_DEC_HIST
+00F2   2???           00355     GOTO    B_DEC_HIST_PRESS
+00F3   2???           00356     CALL    RESETA_FILTRO4
+00F4   0008           00357     RETURN    
+MPASM 5.71                          MAIN.ASM   5-14-2024  23:05:01         PAGE  8
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00358 
+00F5                  00359 INCREMENTAR_HIST
+00F5   300A           00360     MOVLW   .10
+00F6   022D           00361     SUBWF   HISTERESE,W
+00F7   1C03           00362     BTFSS   STATUS,C
+Message[305]: Using default destination of 1 (file).
+00F8   0AAD           00363     INCF    HISTERESE
+00F9   0008           00364     RETURN
+00FA                  00365 DECREMENTAR_HIST
+00FA   3000           00366     MOVLW   .0
+00FB   022D           00367     SUBWF   HISTERESE,W
+00FC   1D03           00368     BTFSS   STATUS,Z
+Message[305]: Using default destination of 1 (file).
+00FD   03AD           00369     DECF    HISTERESE
+00FE   0008           00370     RETURN 
+                      00371 
+00FF                  00372 TROCA_P_SP
+00FF   1025           00373     BCF     MOSTRA_HIST
+0100   1124           00374     BCF     QUAL_CANAL
+0101   2???           00375     GOTO    LACO_PRINCIPAL
+0102                  00376 TROCA_P_PV
+0102   1025           00377     BCF     MOSTRA_HIST
+0103   1524           00378     BSF     QUAL_CANAL
+0104   2???           00379     GOTO    LACO_PRINCIPAL
+0105                  00380 COMPARA_POT_MIN
+0105   3055           00381     MOVLW   .85
+0106   022B           00382     SUBWF   VALOR_SP,W
+0107   1803           00383     BTFSC  STATUS,C
+0108   0008           00384     RETURN
+0109   3055           00385     MOVLW   .85
+010A   00AB           00386     MOVWF   VALOR_SP
+010B   0008           00387     RETURN
+010C                  00388 COMPARA_POT_MAX
+010C   30B9           00389     MOVLW   .185
+010D   022B           00390     SUBWF   VALOR_SP,W
+010E   1C03           00391     BTFSS   STATUS,C
+010F   0008           00392     RETURN
+0110   30B9           00393     MOVLW   .185
+0111   00AB           00394     MOVWF   VALOR_SP
+0112   0008           00395     RETURN
+0113                  00396 DELAY_TROCA_CANAL
+0113   3014           00397     MOVLW   .20             ;W = 20
+0114   00AA           00398     MOVWF   CONTADOR2       ;CONTADOR2 = 20
+0115   0BAA           00399     DECFSZ  CONTADOR2,F     ;CONTADOR2--
+0116   2???           00400     GOTO    $-1             ;se n o zerou decrementa novamente
+0117   0008           00401     RETURN 
+Warning[205]: Found directive in column 1. (END)
+3F72                  00402 END
+MPASM 5.71                          MAIN.ASM   5-14-2024  23:05:01         PAGE  9
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+ACAO1                             FLAGS,4
+ACAO2                             FLAGS,5
+ACAO3                             FLAGS,6
+ACAO4                             FLAGS,7
+ACKDT                             00000005
+ACKEN                             00000004
+ACKSTAT                           00000006
+ADCON0                            0000001F
+ADCON1                            0000009F
+ADCS0                             00000006
+ADCS1                             00000007
+ADCS2                             00000006
+ADDEN                             00000003
+ADFM                              00000007
+ADIE                              00000006
+ADIF                              00000006
+ADON                              00000000
+ADRESH                            0000001E
+ADRESL                            0000009E
+ATUALIZA_DISPLAY                  0000007D
+BANK0                             BCF STATUS,RP0
+BANK1                             BSF STATUS,RP0
+BCLIE                             00000003
+BCLIF                             00000003
+BF                                00000000
+BRGH                              00000002
+BUSCA_CODIGO                      000000AF
+BUSCA_CODIGO_VAR                  000000AB
+B_DEC_HIST                        PORTB,3
+B_DEC_HIST_PRESS                  000000E1
+B_INC_HIST                        PORTB,2
+B_INC_HIST_PRESS                  000000D6
+B_LG_DSLG                         PORTB,0
+B_LG_DSLG_PRESS                   000000BA
+B_MOSTRA_INFO                     PORTB,1
+B_MOSTRA_INFO_PRESS               000000C7
+C                                 00000000
+C1INV                             00000004
+C1OUT                             00000006
+C2INV                             00000005
+C2OUT                             00000007
+CANAL_SP                          00000045
+CARREGA_SP_VALOR                  00000078
+CCP1CON                           00000017
+CCP1IE                            00000002
+CCP1IF                            00000002
+CCP1M0                            00000000
+CCP1M1                            00000001
+CCP1M2                            00000002
+CCP1M3                            00000003
+CCP1X                             00000005
+CCP1Y                             00000004
+CCP2CON                           0000001D
+MPASM 5.71                          MAIN.ASM   5-14-2024  23:05:01         PAGE 10
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+CCP2IE                            00000000
+CCP2IF                            00000000
+CCP2M0                            00000000
+CCP2M1                            00000001
+CCP2M2                            00000002
+CCP2M3                            00000003
+CCP2X                             00000005
+CCP2Y                             00000004
+CCPR1                             00000015
+CCPR1H                            00000016
+CCPR1L                            00000015
+CCPR2                             0000001B
+CCPR2H                            0000001C
+CCPR2L                            0000001B
+CENTENA                           00000022
+CHECK_B_HIST                      000000EC
+CHS0                              00000003
+CHS1                              00000004
+CHS2                              00000005
+CIS                               00000003
+CKE                               00000006
+CKP                               00000004
+CM0                               00000000
+CM1                               00000001
+CM2                               00000002
+CMCON                             0000009C
+CMIE                              00000006
+CMIF                              00000006
+COMPARA_POT_MAX                   0000010C
+COMPARA_POT_MIN                   00000105
+CONTADOR                          00000026
+CONTADOR2                         0000002A
+CREN                              00000004
+CSRC                              00000007
+CVR0                              00000000
+CVR1                              00000001
+CVR2                              00000002
+CVR3                              00000003
+CVRCON                            0000009D
+CVREN                             00000007
+CVROE                             00000006
+CVRR                              00000005
+D                                 00000005
+DATA_ADDRESS                      00000005
+DC                                00000001
+DECREMENTAR_HIST                  000000FA
+DELAY_TROCA_CANAL                 00000113
+DESLIGA_PRESS                     0000007A
+DEZENA                            00000021
+DISPLAY                           PORTD
+D_A                               00000005
+D_CENTENA                         PORTB,6
+D_DEZENA                          PORTB,5
+MPASM 5.71                          MAIN.ASM   5-14-2024  23:05:01         PAGE 11
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+D_MILHAR                          PORTB,7
+D_NOT_A                           00000005
+D_UNIDADE                         PORTB,4
+EEADR                             0000010D
+EEADRH                            0000010F
+EECON1                            0000018C
+EECON2                            0000018D
+EEDATA                            0000010C
+EEDATH                            0000010E
+EEIE                              00000004
+EEIF                              00000004
+EEPGD                             00000007
+EH_NEGATIVO                       0000006F
+EXTRAI_CENTENA                    00000056
+EXTRAI_DEZENA                     0000005D
+EXTRAI_UNIDADE                    00000064
+EXTRAI_VALOR                      00000053
+F                                 00000001
+FERR                              00000002
+FILTRO1                           0000002E
+FILTRO2                           0000002F
+FILTRO3                           00000030
+FILTRO4                           00000031
+FIM_TEMPO                         FLAGS,0
+FLAGS                             00000024
+FLAGS2                            00000025
+FSR                               00000004
+GCEN                              00000007
+GIE                               00000007
+GO                                00000002
+GO_DONE                           00000002
+GO_NOT_DONE                       00000002
+HEATER                            PORTC,2
+HISTERESE                         0000002D
+I2C_DATA                          00000005
+I2C_READ                          00000002
+I2C_START                         00000003
+I2C_STOP                          00000004
+IBF                               00000007
+IBOV                              00000005
+INCREMENTAR_HIST                  000000F5
+INDF                              00000000
+INTCON                            0000000B
+INTE                              00000004
+INTEDG                            00000006
+INTF                              00000001
+INT_ATIVA                         FLAGS,1
+IRP                               00000007
+LACO_PRINCIPAL                    00000030
+LEITURA_ADC                       0000003D
+MILHAR                            00000023
+MOSTRAR_HIST                      00000076
+MOSTRAR_HISTERESE                 0000009E
+MPASM 5.71                          MAIN.ASM   5-14-2024  23:05:01         PAGE 12
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+MOSTRAR_POTENCIOMETRO             000000A1
+MOSTRAR_TEMPERATURA               000000A4
+MOSTRA_HIST                       FLAGS2,0
+MOSTRA_VAR                        000000A7
+NOT_A                             00000005
+NOT_ADDRESS                       00000005
+NOT_BO                            00000000
+NOT_BOR                           00000000
+NOT_DONE                          00000002
+NOT_PD                            00000003
+NOT_POR                           00000001
+NOT_RBPU                          00000007
+NOT_RC8                           00000006
+NOT_T1SYNC                        00000002
+NOT_TO                            00000004
+NOT_TX8                           00000006
+NOT_W                             00000002
+NOT_WRITE                         00000002
+OBF                               00000006
+OERR                              00000001
+OPTION_REG                        00000081
+P                                 00000004
+PCFG0                             00000000
+PCFG1                             00000001
+PCFG2                             00000002
+PCFG3                             00000003
+PCL                               00000002
+PCLATH                            0000000A
+PCON                              0000008E
+PEIE                              00000006
+PEN                               00000002
+PIE1                              0000008C
+PIE2                              0000008D
+PIR1                              0000000C
+PIR2                              0000000D
+PORTA                             00000005
+PORTB                             00000006
+PORTC                             00000007
+PORTD                             00000008
+PORTE                             00000009
+PR2                               00000092
+PROCESSO                          FLAGS,3
+PS0                               00000000
+PS1                               00000001
+PS2                               00000002
+PSA                               00000003
+PSPIE                             00000007
+PSPIF                             00000007
+PSPMODE                           00000004
+QUAL_CANAL                        FLAGS,2
+R                                 00000002
+RA0                               00000000
+RA1                               00000001
+MPASM 5.71                          MAIN.ASM   5-14-2024  23:05:01         PAGE 13
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+RA2                               00000002
+RA3                               00000003
+RA4                               00000004
+RA5                               00000005
+RB0                               00000000
+RB1                               00000001
+RB2                               00000002
+RB3                               00000003
+RB4                               00000004
+RB5                               00000005
+RB6                               00000006
+RB7                               00000007
+RBIE                              00000003
+RBIF                              00000000
+RC0                               00000000
+RC1                               00000001
+RC2                               00000002
+RC3                               00000003
+RC4                               00000004
+RC5                               00000005
+RC6                               00000006
+RC7                               00000007
+RC8_9                             00000006
+RC9                               00000006
+RCD8                              00000000
+RCEN                              00000003
+RCIE                              00000005
+RCIF                              00000005
+RCREG                             0000001A
+RCSTA                             00000018
+RD                                00000000
+RD0                               00000000
+RD1                               00000001
+RD2                               00000002
+RD3                               00000003
+RD4                               00000004
+RD5                               00000005
+RD6                               00000006
+RD7                               00000007
+RE0                               00000000
+RE1                               00000001
+RE2                               00000002
+READ_WRITE                        00000002
+RESETA_FILTRO1                    000000C3
+RESETA_FILTRO2                    000000D2
+RESETA_FILTRO3                    000000DD
+RESETA_FILTRO4                    000000E8
+RP0                               00000005
+RP1                               00000006
+RSEN                              00000001
+RX9                               00000006
+RX9D                              00000000
+R_NOT_W                           00000002
+MPASM 5.71                          MAIN.ASM   5-14-2024  23:05:01         PAGE 14
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+R_W                               00000002
+S                                 00000003
+SAI_INTERRUPCAO                   00000012
+SEN                               00000000
+SMP                               00000007
+SPBRG                             00000099
+SPEN                              00000007
+SREN                              00000005
+SSPADD                            00000093
+SSPBUF                            00000013
+SSPCON                            00000014
+SSPCON2                           00000091
+SSPEN                             00000005
+SSPIE                             00000003
+SSPIF                             00000003
+SSPM0                             00000000
+SSPM1                             00000001
+SSPM2                             00000002
+SSPM3                             00000003
+SSPOV                             00000006
+SSPSTAT                           00000094
+START                             00000016
+STATUS                            00000003
+SYNC                              00000004
+S_TEMP                            00000028
+T0CS                              00000005
+T0IE                              00000005
+T0IF                              00000002
+T0SE                              00000004
+T1CKPS0                           00000004
+T1CKPS1                           00000005
+T1CON                             00000010
+T1INSYNC                          00000002
+T1OSCEN                           00000003
+T1SYNC                            00000002
+T2CKPS0                           00000000
+T2CKPS1                           00000001
+T2CON                             00000012
+TESTA_B_INFO                      00000037
+TESTA_CENTENA                     0000008E
+TESTA_DEZENA                      00000086
+TESTA_UNIDADE                     00000098
+TMR0                              00000001
+TMR0IE                            00000005
+TMR0IF                            00000002
+TMR1                              0000000E
+TMR1CS                            00000001
+TMR1H                             0000000F
+TMR1IE                            00000000
+TMR1IF                            00000000
+TMR1L                             0000000E
+TMR1ON                            00000000
+TMR2                              00000011
+MPASM 5.71                          MAIN.ASM   5-14-2024  23:05:01         PAGE 15
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+TMR2IE                            00000001
+TMR2IF                            00000001
+TMR2ON                            00000002
+TOUTPS0                           00000003
+TOUTPS1                           00000004
+TOUTPS2                           00000005
+TOUTPS3                           00000006
+TRISA                             00000085
+TRISA0                            00000000
+TRISA1                            00000001
+TRISA2                            00000002
+TRISA3                            00000003
+TRISA4                            00000004
+TRISA5                            00000005
+TRISB                             00000086
+TRISB0                            00000000
+TRISB1                            00000001
+TRISB2                            00000002
+TRISB3                            00000003
+TRISB4                            00000004
+TRISB5                            00000005
+TRISB6                            00000006
+TRISB7                            00000007
+TRISC                             00000087
+TRISC0                            00000000
+TRISC1                            00000001
+TRISC2                            00000002
+TRISC3                            00000003
+TRISC4                            00000004
+TRISC5                            00000005
+TRISC6                            00000006
+TRISC7                            00000007
+TRISD                             00000088
+TRISD0                            00000000
+TRISD1                            00000001
+TRISD2                            00000002
+TRISD3                            00000003
+TRISD4                            00000004
+TRISD5                            00000005
+TRISD6                            00000006
+TRISD7                            00000007
+TRISE                             00000089
+TRISE0                            00000000
+TRISE1                            00000001
+TRISE2                            00000002
+TRMT                              00000001
+TROCA_P_PV                        00000102
+TROCA_P_SP                        000000FF
+TX8_9                             00000006
+TX9                               00000006
+TX9D                              00000000
+TXD8                              00000000
+TXEN                              00000005
+MPASM 5.71                          MAIN.ASM   5-14-2024  23:05:01         PAGE 16
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+TXIE                              00000004
+TXIF                              00000004
+TXREG                             00000019
+TXSTA                             00000098
+UA                                00000001
+UNIDADE                           00000020
+VALOR_ADC                         00000029
+VALOR_PV                          0000002C
+VALOR_SP                          0000002B
+V_CONT                            000000FA
+V_FILTRO                          00000032
+V_TMR0                            00000083
+W                                 00000000
+WCOL                              00000007
+WR                                00000001
+WREN                              00000002
+WRERR                             00000003
+W_TEMP                            00000027
+Z                                 00000002
+_BODEN_OFF                        00003FBF
+_BODEN_ON                         00003FFF
+_BOREN_OFF                        00003FBF
+_BOREN_ON                         00003FFF
+_CONFIG                           00002007
+_CPD_OFF                          00003FFF
+_CPD_ON                           00003EFF
+_CP_ALL                           00001FFF
+_CP_OFF                           00003FFF
+_CP_ON                            00001FFF
+_DEBUG_OFF                        00003FFF
+_DEBUG_ON                         000037FF
+_DEVID1                           00002006
+_FOSC_EXTRC                       00003FFF
+_FOSC_HS                          00003FFE
+_FOSC_LP                          00003FFC
+_FOSC_XT                          00003FFD
+_HS_OSC                           00003FFE
+_IDLOC0                           00002000
+_IDLOC1                           00002001
+_IDLOC2                           00002002
+_IDLOC3                           00002003
+_ISR_0042                         00000042
+_ISR_0049                         00000049
+_ISR_0116                         00000116
+_LP_OSC                           00003FFC
+_LVP_OFF                          00003F7F
+_LVP_ON                           00003FFF
+_PWRTE_OFF                        00003FFF
+_PWRTE_ON                         00003FF7
+_RC_OSC                           00003FFF
+_WDTE_OFF                         00003FFB
+_WDTE_ON                          00003FFF
+_WDT_OFF                          00003FFB
+MPASM 5.71                          MAIN.ASM   5-14-2024  23:05:01         PAGE 17
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_WDT_ON                           00003FFF
+_WRT_1FOURTH                      00003BFF
+_WRT_256                          00003DFF
+_WRT_HALF                         000039FF
+_WRT_OFF                          00003FFF
+_XT_OSC                           00003FFD
+__16F877A                         00000001
+
+Errors   :     0
+Warnings :     1 reported,     0 suppressed
+Messages :     6 reported,     0 suppressed
+
+

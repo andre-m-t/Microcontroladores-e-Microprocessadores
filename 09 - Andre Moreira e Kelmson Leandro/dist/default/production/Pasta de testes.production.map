@@ -1,0 +1,120 @@
+MPLINK 5.08, LINKER
+Linker Map File - Created Tue May 14 23:05:02 2024
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                 RES_VECT       code   0x000000    program   0x000002
+                   .cinit    romdata   0x000001    program   0x000004
+                      ISR       code   0x000004    program   0x000228
+.config_2007_BUILD/DEFAULT/PRODUCTION/MAIN.O       code   0x002007    program   0x000002
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x000002      
+                            0x000004    0x000117      
+                            0x002007    0x002007      
+            280 out of 8454 program addresses used, program memory utilization is 3%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+         ATUALIZA_DISPLAY   0x00007d    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+             BUSCA_CODIGO   0x0000af    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+         BUSCA_CODIGO_VAR   0x0000ab    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+         B_DEC_HIST_PRESS   0x0000e1    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+         B_INC_HIST_PRESS   0x0000d6    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+          B_LG_DSLG_PRESS   0x0000ba    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+      B_MOSTRA_INFO_PRESS   0x0000c7    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+                 CANAL_SP   0x000045    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+         CARREGA_SP_VALOR   0x000078    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+             CHECK_B_HIST   0x0000ec    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+          COMPARA_POT_MAX   0x00010c    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+          COMPARA_POT_MIN   0x000105    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+         DECREMENTAR_HIST   0x0000fa    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+        DELAY_TROCA_CANAL   0x000113    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+            DESLIGA_PRESS   0x00007a    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+              EH_NEGATIVO   0x00006f    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+           EXTRAI_CENTENA   0x000056    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+            EXTRAI_DEZENA   0x00005d    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+           EXTRAI_UNIDADE   0x000064    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+             EXTRAI_VALOR   0x000053    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+         INCREMENTAR_HIST   0x0000f5    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+           LACO_PRINCIPAL   0x000030    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+              LEITURA_ADC   0x00003d    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+             MOSTRAR_HIST   0x000076    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+        MOSTRAR_HISTERESE   0x00009e    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+    MOSTRAR_POTENCIOMETRO   0x0000a1    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+      MOSTRAR_TEMPERATURA   0x0000a4    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+               MOSTRA_VAR   0x0000a7    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+           RESETA_FILTRO1   0x0000c3    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+           RESETA_FILTRO2   0x0000d2    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+           RESETA_FILTRO3   0x0000dd    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+           RESETA_FILTRO4   0x0000e8    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+          SAI_INTERRUPCAO   0x000012    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+                    START   0x000016    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+             TESTA_B_INFO   0x000037    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+            TESTA_CENTENA   0x00008e    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+             TESTA_DEZENA   0x000086    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+            TESTA_UNIDADE   0x000098    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+               TROCA_P_PV   0x000102    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+               TROCA_P_SP   0x0000ff    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+                _ISR_0042   0x000042    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+                _ISR_0049   0x000049    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+                _ISR_0116   0x000116    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+          SAI_INTERRUPCAO   0x000012    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+                    START   0x000016    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+           LACO_PRINCIPAL   0x000030    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+             TESTA_B_INFO   0x000037    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+              LEITURA_ADC   0x00003d    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+                _ISR_0042   0x000042    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+                 CANAL_SP   0x000045    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+                _ISR_0049   0x000049    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+             EXTRAI_VALOR   0x000053    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+           EXTRAI_CENTENA   0x000056    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+            EXTRAI_DEZENA   0x00005d    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+           EXTRAI_UNIDADE   0x000064    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+              EH_NEGATIVO   0x00006f    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+             MOSTRAR_HIST   0x000076    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+         CARREGA_SP_VALOR   0x000078    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+            DESLIGA_PRESS   0x00007a    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+         ATUALIZA_DISPLAY   0x00007d    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+             TESTA_DEZENA   0x000086    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+            TESTA_CENTENA   0x00008e    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+            TESTA_UNIDADE   0x000098    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+        MOSTRAR_HISTERESE   0x00009e    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+    MOSTRAR_POTENCIOMETRO   0x0000a1    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+      MOSTRAR_TEMPERATURA   0x0000a4    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+               MOSTRA_VAR   0x0000a7    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+         BUSCA_CODIGO_VAR   0x0000ab    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+             BUSCA_CODIGO   0x0000af    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+          B_LG_DSLG_PRESS   0x0000ba    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+           RESETA_FILTRO1   0x0000c3    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+      B_MOSTRA_INFO_PRESS   0x0000c7    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+           RESETA_FILTRO2   0x0000d2    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+         B_INC_HIST_PRESS   0x0000d6    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+           RESETA_FILTRO3   0x0000dd    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+         B_DEC_HIST_PRESS   0x0000e1    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+           RESETA_FILTRO4   0x0000e8    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+             CHECK_B_HIST   0x0000ec    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+         INCREMENTAR_HIST   0x0000f5    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+         DECREMENTAR_HIST   0x0000fa    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+               TROCA_P_SP   0x0000ff    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+               TROCA_P_PV   0x000102    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+          COMPARA_POT_MIN   0x000105    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+          COMPARA_POT_MAX   0x00010c    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+        DELAY_TROCA_CANAL   0x000113    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+                _ISR_0116   0x000116    program     static C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\Projetos\Pasta de testes\main.asm
+
+
