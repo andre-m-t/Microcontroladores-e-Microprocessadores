@@ -1,0 +1,57 @@
+
+ROM used:   512/8192 (6%)
+            512/8192 (6%) including unused fragments
+
+            0.6 Average locations per line
+            4.6 Average locations per statement
+
+RAM used:   33/368 (9%) at main() level
+            40/368 (11%) worst case
+
+Stack used: 3 worst case (2 in main + 1 for interrupts)
+Stack size: 8
+
+Lines Stmts  %   Files
+----- ----- ---  -----
+  193   112 100  leituraanalogica.c
+   21     0   0  leituraanalogica.h
+  684     0   0  D:\Program Files (x86)\PICC\Devices\16F877A.h
+----- -----
+  898   112 Total
+
+Page ROM  %  RAM    Vol Diff  Functions:
+---- --- --- ---    --- ----  ----------
+0     15   3    0    193  3.1  TIMER0_isr
+0     76  15    0    270  2.8  MAIN
+0     19   4    0    130  3.0  mostrarDisplay
+0    154  30    2   1689  6.4  quebrarNumero
+0     37   7    5    149  2.2  @DIV1616
+0     13   3    0    149  2.2  @goto9014
+0     14   3    0    149  2.2  @goto9058
+0     40   8    0    149  2.2  leiturasAnalogicas
+0     97  19    1    531  4.3  varrerDisplay
+ Inline         0    274  7.3  @cinit1
+
+Program metrics:
+    Functions               10
+    Statements              112
+    Comments                131
+    Volume (V)              5580
+    Difficulty (D)          35.5
+    Effort to implement (E) 198005
+    Time to implement (T)   3 hours, 3 minutes
+    Est Delivered Bugs (B)  1
+    Cyclomatic Complexity   31
+    Maintainability (MI)    67
+
+ Segment     Used  Free
+-----------  ----  ----
+00000-00003     4  0  
+00004-0002E    43  0  
+0002F-007FF   465  1536  
+00800-00FFF     0  2048  
+01000-017FF     0  2048  
+01800-01FFF     0  2048  
+
+
+

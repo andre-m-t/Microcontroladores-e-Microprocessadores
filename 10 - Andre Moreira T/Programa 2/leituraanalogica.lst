@@ -1,0 +1,764 @@
+CCS PCM C Compiler, Version 5.076, 56587               30-mai-24 22:58
+
+               Filename:   C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\MICRO 2024\Projetos\c\10 - Andre Moreira Tavares\Programa 2\leituraanalogica.lst
+
+               ROM used:   512 words (6%)
+                           Largest free fragment is 2048
+               RAM used:   33 (9%) at main() level
+                           40 (11%) worst case
+               Stack used: 3 locations (2 in main + 1 for interrupts)
+               Stack size: 8
+
+*
+0000:  MOVLW  01
+0001:  MOVWF  0A
+0002:  GOTO   1B4
+0003:  NOP
+0004:  MOVWF  7F
+0005:  SWAPF  03,W
+0006:  CLRF   03
+0007:  MOVWF  21
+0008:  MOVF   0A,W
+0009:  MOVWF  20
+000A:  CLRF   0A
+000B:  MOVF   04,W
+000C:  MOVWF  22
+000D:  MOVF   77,W
+000E:  MOVWF  23
+000F:  MOVF   78,W
+0010:  MOVWF  24
+0011:  MOVF   79,W
+0012:  MOVWF  25
+0013:  MOVF   7A,W
+0014:  MOVWF  26
+0015:  BCF    03.7
+0016:  BCF    03.5
+0017:  BTFSS  0B.5
+0018:  GOTO   01B
+0019:  BTFSC  0B.2
+001A:  GOTO   02C
+001B:  MOVF   22,W
+001C:  MOVWF  04
+001D:  MOVF   23,W
+001E:  MOVWF  77
+001F:  MOVF   24,W
+0020:  MOVWF  78
+0021:  MOVF   25,W
+0022:  MOVWF  79
+0023:  MOVF   26,W
+0024:  MOVWF  7A
+0025:  MOVF   20,W
+0026:  MOVWF  0A
+0027:  SWAPF  21,W
+0028:  MOVWF  03
+0029:  SWAPF  7F,F
+002A:  SWAPF  7F,W
+002B:  RETFIE
+002C:  BCF    0A.3
+002D:  BCF    0A.4
+002E:  GOTO   02F
+.................... #include <leituraanalogica.h> 
+.................... #include <16F877A.h> 
+.................... //////////// Standard Header file for the PIC16F877A device //////////////// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... ////        (C) Copyright 1996, 2014 Custom Computer Services          //// 
+.................... //// This source code may only be used by licensed users of the CCS C  //// 
+.................... //// compiler.  This source code may only be distributed to other      //// 
+.................... //// licensed users of the CCS C compiler.  No other use, reproduction //// 
+.................... //// or distribution is permitted without written permission.          //// 
+.................... //// Derivative programs created using this software in object code    //// 
+.................... //// form are not restricted in any way.                               //// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... #device PIC16F877A 
+*
+0066:  CLRF   78
+0067:  CLRF   79
+0068:  CLRF   77
+0069:  CLRF   7A
+006A:  MOVF   41,W
+006B:  BTFSS  03.2
+006C:  GOTO   070
+006D:  MOVF   40,W
+006E:  BTFSC  03.2
+006F:  GOTO   08A
+0070:  MOVLW  10
+0071:  MOVWF  42
+0072:  BCF    03.0
+0073:  RLF    3E,F
+0074:  RLF    3F,F
+0075:  RLF    77,F
+0076:  RLF    7A,F
+0077:  MOVF   41,W
+0078:  SUBWF  7A,W
+0079:  BTFSS  03.2
+007A:  GOTO   07D
+007B:  MOVF   40,W
+007C:  SUBWF  77,W
+007D:  BTFSS  03.0
+007E:  GOTO   086
+007F:  MOVF   40,W
+0080:  SUBWF  77,F
+0081:  BTFSS  03.0
+0082:  DECF   7A,F
+0083:  MOVF   41,W
+0084:  SUBWF  7A,F
+0085:  BSF    03.0
+0086:  RLF    78,F
+0087:  RLF    79,F
+0088:  DECFSZ 42,F
+0089:  GOTO   072
+008A:  RETURN
+*
+0125:  BSF    0A.0
+0126:  BCF    0A.1
+0127:  BCF    0A.2
+0128:  ADDWF  02,F
+0129:  GOTO   0B0
+012A:  GOTO   0B7
+012B:  GOTO   0BE
+012C:  GOTO   0C5
+012D:  GOTO   0CC
+012E:  GOTO   0D3
+012F:  GOTO   0DA
+0130:  GOTO   0E1
+0131:  GOTO   0E8
+0132:  BSF    0A.0
+0133:  BCF    0A.1
+0134:  BCF    0A.2
+0135:  ADDWF  02,F
+0136:  GOTO   0FE
+0137:  GOTO   101
+0138:  GOTO   105
+0139:  GOTO   109
+013A:  GOTO   10D
+013B:  GOTO   111
+013C:  GOTO   115
+013D:  GOTO   119
+013E:  GOTO   11D
+013F:  GOTO   121
+....................  
+.................... #list 
+....................  
+.................... #device ADC=10 
+....................  
+.................... #FUSES PUT                      //Power Up Timer 
+.................... #FUSES NOBROWNOUT               //No brownout reset 
+.................... #FUSES LVP                      //Low Voltage Programming on B3(PIC16) or B5(PIC18) 
+.................... #FUSES NOCPD                    //No EE protection 
+.................... #FUSES NOWRT                    //Program memory not write protected 
+.................... #FUSES NOPROTECT                //Code not protected from reading 
+....................  
+.................... #use delay(crystal=4MHz) 
+....................  
+.................... #use fixed_io(b_outputs= PIN_B4, PIN_B5, PIN_B6, PIN_B7) 
+.................... #use fixed_io(d_outputs= PIN_D0, PIN_D1, PIN_D2, PIN_D3, PIN_D4, PIN_D5, PIN_D6, PIN_D7) 
+....................  
+.................... #define d_unidade    PIN_B4 
+.................... #define d_dezena     PIN_B5 
+.................... #define d_centena    PIN_B6 
+.................... #define d_milhar     PIN_B7 
+....................  
+....................  
+.................... //constantes 
+.................... #define vl_cont1 250    //2ms*250 = 500ms 
+.................... #define vl_cont2 10    //500ms*10 = 5000ms -> 5s 
+....................  
+.................... #define canal_temp 0 
+.................... #define canal_pot  1 
+....................  
+.................... //variaveis globais 
+.................... int1 fim_2ms = 0; 
+.................... int1 fim_500ms = 0; 
+.................... int1 fim_5s = 0; 
+.................... int1 mostrarPot = 1; 
+.................... int8 cont1 = vl_cont1; 
+.................... int8 cont2 = vl_cont2; 
+.................... char codigo[10] = {0b00111111,0b00000110,0b01011011,0b01001111,0b01100110,0b01101101,0b01111101,0b00000111,0b01111111,0b01101111}; //código para aparecer nodisplay 
+*
+01C7:  MOVLW  3F
+01C8:  BCF    03.5
+01C9:  MOVWF  2A
+01CA:  MOVLW  06
+01CB:  MOVWF  2B
+01CC:  MOVLW  5B
+01CD:  MOVWF  2C
+01CE:  MOVLW  4F
+01CF:  MOVWF  2D
+01D0:  MOVLW  66
+01D1:  MOVWF  2E
+01D2:  MOVLW  6D
+01D3:  MOVWF  2F
+01D4:  MOVLW  7D
+01D5:  MOVWF  30
+01D6:  MOVLW  07
+01D7:  MOVWF  31
+01D8:  MOVLW  7F
+01D9:  MOVWF  32
+01DA:  MOVLW  6F
+01DB:  MOVWF  33
+.................... int8 unidade, dezena, centena, milhar; 
+.................... int16 potenciometro, temperatura; 
+....................  
+.................... //declaracao de funcoes 
+.................... void varrerDisplay(); 
+.................... void leiturasAnalogicas(); 
+.................... void mostrarDisplay(); 
+.................... void quebrarNumero(int16 valor); 
+.................... //espaco reservado para interrupcao 
+.................... #INT_TIMER0 
+.................... void  TIMER0_isr(void)  
+.................... { 
+....................    fim_2ms = 1; 
+*
+002F:  BSF    27.0
+....................    cont1--; 
+0030:  DECFSZ 28,F
+....................    if(cont1 == 0){ 
+0031:  GOTO   03A
+....................       cont1 = vl_cont1; 
+0032:  MOVLW  FA
+0033:  MOVWF  28
+....................       fim_500ms = 1; 
+0034:  BSF    27.1
+....................       cont2--; 
+0035:  DECFSZ 29,F
+....................       if(cont2 == 0){ 
+0036:  GOTO   03A
+....................          cont2 = vl_cont2; 
+0037:  MOVLW  0A
+0038:  MOVWF  29
+....................          fim_5s = 1; 
+0039:  BSF    27.2
+....................       } 
+....................    }    
+....................     
+003A:  BCF    0B.2
+003B:  BCF    0A.3
+003C:  BCF    0A.4
+003D:  GOTO   01B
+.................... } 
+....................  
+.................... void main() 
+*
+01B4:  MOVF   03,W
+01B5:  ANDLW  1F
+01B6:  MOVWF  03
+01B7:  BCF    27.0
+01B8:  BCF    27.1
+01B9:  BCF    27.2
+01BA:  BSF    27.3
+01BB:  MOVLW  FA
+01BC:  MOVWF  28
+01BD:  MOVLW  0A
+01BE:  MOVWF  29
+01BF:  BSF    03.5
+01C0:  BSF    1F.0
+01C1:  BSF    1F.1
+01C2:  BSF    1F.2
+01C3:  BCF    1F.3
+01C4:  MOVLW  07
+01C5:  MOVWF  1C
+01C6:  BCF    03.7
+.................... { 
+....................    setup_adc_ports(AN0_AN1_AN3); 
+*
+01DC:  BSF    03.5
+01DD:  BCF    1F.0
+01DE:  BCF    1F.1
+01DF:  BSF    1F.2
+01E0:  BCF    1F.3
+....................    setup_adc(ADC_CLOCK_INTERNAL); 
+01E1:  BCF    1F.6
+01E2:  BCF    03.5
+01E3:  BSF    1F.6
+01E4:  BSF    1F.7
+01E5:  BSF    03.5
+01E6:  BSF    1F.7
+01E7:  BCF    03.5
+01E8:  BSF    1F.0
+....................    setup_timer_0(RTCC_INTERNAL|RTCC_DIV_8|RTCC_8_BIT);      //2,0 ms overflow 
+01E9:  BSF    03.5
+01EA:  MOVF   01,W
+01EB:  ANDLW  C0
+01EC:  IORLW  02
+01ED:  MOVWF  01
+....................  
+....................  
+....................    enable_interrupts(INT_TIMER0); 
+01EE:  BCF    03.5
+01EF:  BSF    0B.5
+....................    enable_interrupts(GLOBAL); 
+01F0:  MOVLW  C0
+01F1:  IORWF  0B,F
+....................     
+....................     
+....................    //iniciar com valor do pot 
+....................    leiturasAnalogicas(); 
+01F2:  CALL   03E
+....................    quebrarNumero(potenciometro); 
+01F3:  MOVF   39,W
+01F4:  MOVWF  3D
+01F5:  MOVF   38,W
+01F6:  MOVWF  3C
+01F7:  CALL   08B
+....................  
+....................    while(TRUE) 
+....................    { 
+....................       if(fim_2ms) 
+01F8:  BTFSC  27.0
+....................          varrerDisplay(); 
+01F9:  GOTO   140
+....................       if(fim_500ms) 
+01FA:  BTFSC  27.1
+....................          leiturasAnalogicas(); 
+01FB:  CALL   03E
+....................       if(fim_5s) 
+01FC:  BTFSC  27.2
+....................          mostrarDisplay(); 
+01FD:  GOTO   1A1
+01FE:  GOTO   1F8
+....................    } 
+....................  
+.................... } 
+.................... void mostrarDisplay(){ 
+01FF:  SLEEP
+....................    fim_5s = 0; 
+*
+01A1:  BCF    27.2
+....................    if(mostrarPot){ 
+01A2:  BTFSS  27.3
+01A3:  GOTO   1AB
+....................       mostrarpot = 0; 
+01A4:  BCF    27.3
+....................       quebrarNumero(potenciometro); 
+01A5:  MOVF   39,W
+01A6:  MOVWF  3D
+01A7:  MOVF   38,W
+01A8:  MOVWF  3C
+01A9:  CALL   08B
+....................  
+....................    }else{ 
+01AA:  GOTO   1B1
+....................       mostrarPot = 1; 
+01AB:  BSF    27.3
+....................       quebrarNumero(temperatura); 
+01AC:  MOVF   3B,W
+01AD:  MOVWF  3D
+01AE:  MOVF   3A,W
+01AF:  MOVWF  3C
+01B0:  CALL   08B
+....................    } 
+....................    return; 
+01B1:  BCF    0A.3
+01B2:  BCF    0A.4
+01B3:  GOTO   1FE (RETURN)
+.................... } 
+....................  
+.................... void quebrarNumero(int16 valor){ 
+....................    milhar = valor/1000; 
+*
+008B:  MOVF   3D,W
+008C:  MOVWF  3F
+008D:  MOVF   3C,W
+008E:  MOVWF  3E
+008F:  MOVLW  03
+0090:  MOVWF  41
+0091:  MOVLW  E8
+0092:  MOVWF  40
+0093:  CALL   066
+0094:  MOVF   78,W
+0095:  MOVWF  37
+....................    if(milhar > 0) 
+0096:  MOVF   37,F
+0097:  BTFSC  03.2
+0098:  GOTO   09F
+....................       valor = valor - 1000; 
+0099:  MOVLW  E8
+009A:  SUBWF  3C,F
+009B:  MOVLW  03
+009C:  BTFSS  03.0
+009D:  MOVLW  04
+009E:  SUBWF  3D,F
+....................    centena = valor/100; 
+009F:  MOVF   3D,W
+00A0:  MOVWF  3F
+00A1:  MOVF   3C,W
+00A2:  MOVWF  3E
+00A3:  CLRF   41
+00A4:  MOVLW  64
+00A5:  MOVWF  40
+00A6:  CALL   066
+00A7:  MOVF   78,W
+00A8:  MOVWF  36
+....................    switch(centena){ 
+00A9:  MOVLW  01
+00AA:  SUBWF  36,W
+00AB:  ADDLW  F7
+00AC:  BTFSC  03.0
+00AD:  GOTO   0EE
+00AE:  ADDLW  09
+00AF:  GOTO   125
+....................       case 1: 
+....................          valor = valor -100; 
+00B0:  MOVLW  64
+00B1:  SUBWF  3C,F
+00B2:  MOVLW  00
+00B3:  BTFSS  03.0
+00B4:  MOVLW  01
+00B5:  SUBWF  3D,F
+....................          break; 
+00B6:  GOTO   0EE
+....................       case 2: 
+....................          valor = valor -200; 
+00B7:  MOVLW  C8
+00B8:  SUBWF  3C,F
+00B9:  MOVLW  00
+00BA:  BTFSS  03.0
+00BB:  MOVLW  01
+00BC:  SUBWF  3D,F
+....................          break; 
+00BD:  GOTO   0EE
+....................       case 3: 
+....................          valor = valor -300; 
+00BE:  MOVLW  2C
+00BF:  SUBWF  3C,F
+00C0:  MOVLW  01
+00C1:  BTFSS  03.0
+00C2:  MOVLW  02
+00C3:  SUBWF  3D,F
+....................          break; 
+00C4:  GOTO   0EE
+....................       case 4: 
+....................          valor = valor -400; 
+00C5:  MOVLW  90
+00C6:  SUBWF  3C,F
+00C7:  MOVLW  01
+00C8:  BTFSS  03.0
+00C9:  MOVLW  02
+00CA:  SUBWF  3D,F
+....................          break; 
+00CB:  GOTO   0EE
+....................       case 5: 
+....................          valor = valor -500; 
+00CC:  MOVLW  F4
+00CD:  SUBWF  3C,F
+00CE:  MOVLW  01
+00CF:  BTFSS  03.0
+00D0:  MOVLW  02
+00D1:  SUBWF  3D,F
+....................          break; 
+00D2:  GOTO   0EE
+....................       case 6: 
+....................          valor = valor -600; 
+00D3:  MOVLW  58
+00D4:  SUBWF  3C,F
+00D5:  MOVLW  02
+00D6:  BTFSS  03.0
+00D7:  MOVLW  03
+00D8:  SUBWF  3D,F
+....................          break; 
+00D9:  GOTO   0EE
+....................       case 7: 
+....................          valor = valor -700; 
+00DA:  MOVLW  BC
+00DB:  SUBWF  3C,F
+00DC:  MOVLW  02
+00DD:  BTFSS  03.0
+00DE:  MOVLW  03
+00DF:  SUBWF  3D,F
+....................          break; 
+00E0:  GOTO   0EE
+....................       case 8: 
+....................          valor = valor -800; 
+00E1:  MOVLW  20
+00E2:  SUBWF  3C,F
+00E3:  MOVLW  03
+00E4:  BTFSS  03.0
+00E5:  MOVLW  04
+00E6:  SUBWF  3D,F
+....................          break; 
+00E7:  GOTO   0EE
+....................       case 9: 
+....................          valor = valor-900; 
+00E8:  MOVLW  84
+00E9:  SUBWF  3C,F
+00EA:  MOVLW  03
+00EB:  BTFSS  03.0
+00EC:  MOVLW  04
+00ED:  SUBWF  3D,F
+....................          break; 
+....................    } 
+....................    dezena = valor/10; 
+00EE:  MOVF   3D,W
+00EF:  MOVWF  3F
+00F0:  MOVF   3C,W
+00F1:  MOVWF  3E
+00F2:  CLRF   41
+00F3:  MOVLW  0A
+00F4:  MOVWF  40
+00F5:  CALL   066
+00F6:  MOVF   78,W
+00F7:  MOVWF  35
+....................    switch(dezena){ 
+00F8:  MOVF   35,W
+00F9:  ADDLW  F6
+00FA:  BTFSC  03.0
+00FB:  GOTO   124
+00FC:  ADDLW  0A
+00FD:  GOTO   132
+....................       case 0: 
+....................          unidade = valor; 
+00FE:  MOVF   3C,W
+00FF:  MOVWF  34
+....................          break; 
+0100:  GOTO   124
+....................       case 1: 
+....................          unidade = valor -10; 
+0101:  MOVLW  0A
+0102:  SUBWF  3C,W
+0103:  MOVWF  34
+....................          break; 
+0104:  GOTO   124
+....................       case 2: 
+....................          unidade = valor -20; 
+0105:  MOVLW  14
+0106:  SUBWF  3C,W
+0107:  MOVWF  34
+....................          break; 
+0108:  GOTO   124
+....................       case 3: 
+....................          unidade = valor -30; 
+0109:  MOVLW  1E
+010A:  SUBWF  3C,W
+010B:  MOVWF  34
+....................          break; 
+010C:  GOTO   124
+....................       case 4: 
+....................          unidade = valor -40; 
+010D:  MOVLW  28
+010E:  SUBWF  3C,W
+010F:  MOVWF  34
+....................          break; 
+0110:  GOTO   124
+....................       case 5: 
+....................          unidade = valor -50; 
+0111:  MOVLW  32
+0112:  SUBWF  3C,W
+0113:  MOVWF  34
+....................          break; 
+0114:  GOTO   124
+....................       case 6: 
+....................          unidade = valor -60; 
+0115:  MOVLW  3C
+0116:  SUBWF  3C,W
+0117:  MOVWF  34
+....................          break; 
+0118:  GOTO   124
+....................       case 7: 
+....................          unidade = valor -70; 
+0119:  MOVLW  46
+011A:  SUBWF  3C,W
+011B:  MOVWF  34
+....................          break; 
+011C:  GOTO   124
+....................       case 8: 
+....................          unidade = valor -80; 
+011D:  MOVLW  50
+011E:  SUBWF  3C,W
+011F:  MOVWF  34
+....................          break; 
+0120:  GOTO   124
+....................       case 9: 
+....................          unidade = valor-90; 
+0121:  MOVLW  5A
+0122:  SUBWF  3C,W
+0123:  MOVWF  34
+....................          break; 
+....................    } 
+....................    return; 
+0124:  RETURN
+.................... } 
+....................  
+....................  
+.................... void leiturasAnalogicas(){ 
+....................    fim_500ms = 0; 
+*
+003E:  BCF    27.1
+....................    //adc temperatura 
+....................    set_adc_channel(canal_temp); 
+003F:  MOVLW  00
+0040:  MOVWF  78
+0041:  MOVF   1F,W
+0042:  ANDLW  C7
+0043:  IORWF  78,W
+0044:  MOVWF  1F
+....................    delay_us(40); 
+0045:  MOVLW  0D
+0046:  MOVWF  77
+0047:  DECFSZ 77,F
+0048:  GOTO   047
+....................    temperatura = read_adc(); 
+0049:  BSF    1F.2
+004A:  BTFSC  1F.2
+004B:  GOTO   04A
+004C:  BSF    03.5
+004D:  MOVF   1E,W
+004E:  BCF    03.5
+004F:  MOVWF  3A
+0050:  MOVF   1E,W
+0051:  MOVWF  3B
+....................    //adc potenciometro 
+....................    set_adc_channel(canal_pot); 
+0052:  MOVLW  08
+0053:  MOVWF  78
+0054:  MOVF   1F,W
+0055:  ANDLW  C7
+0056:  IORWF  78,W
+0057:  MOVWF  1F
+....................    delay_us(40); 
+0058:  MOVLW  0D
+0059:  MOVWF  77
+005A:  DECFSZ 77,F
+005B:  GOTO   05A
+....................    potenciometro = read_adc(); 
+005C:  BSF    1F.2
+005D:  BTFSC  1F.2
+005E:  GOTO   05D
+005F:  BSF    03.5
+0060:  MOVF   1E,W
+0061:  BCF    03.5
+0062:  MOVWF  38
+0063:  MOVF   1E,W
+0064:  MOVWF  39
+....................    return; 
+0065:  RETURN
+.................... } 
+....................  
+....................  
+.................... void varrerDisplay(){ 
+....................    fim_2ms = 0; 
+*
+0140:  BCF    27.0
+....................    if(input_state(d_unidade) == 1){ 
+0141:  BTFSS  06.4
+0142:  GOTO   159
+....................       output_low(d_unidade); 
+0143:  MOVLW  0F
+0144:  BSF    03.5
+0145:  MOVWF  06
+0146:  BCF    03.5
+0147:  BCF    06.4
+....................       output_d(codigo[dezena]); 
+0148:  MOVLW  2A
+0149:  ADDWF  35,W
+014A:  MOVWF  04
+014B:  BCF    03.7
+014C:  MOVF   00,W
+014D:  MOVWF  3C
+014E:  BSF    03.5
+014F:  CLRF   08
+0150:  BCF    03.5
+0151:  MOVF   3C,W
+0152:  MOVWF  08
+....................       output_high(d_dezena); 
+0153:  MOVLW  0F
+0154:  BSF    03.5
+0155:  MOVWF  06
+0156:  BCF    03.5
+0157:  BSF    06.5
+....................    }else{ 
+0158:  GOTO   19E
+....................       if(input_state(d_dezena) == 1){ 
+0159:  BTFSS  06.5
+015A:  GOTO   171
+....................          output_low(d_dezena); 
+015B:  MOVLW  0F
+015C:  BSF    03.5
+015D:  MOVWF  06
+015E:  BCF    03.5
+015F:  BCF    06.5
+....................          output_d(codigo[centena]); 
+0160:  MOVLW  2A
+0161:  ADDWF  36,W
+0162:  MOVWF  04
+0163:  BCF    03.7
+0164:  MOVF   00,W
+0165:  MOVWF  3C
+0166:  BSF    03.5
+0167:  CLRF   08
+0168:  BCF    03.5
+0169:  MOVF   3C,W
+016A:  MOVWF  08
+....................          output_high(d_centena); 
+016B:  MOVLW  0F
+016C:  BSF    03.5
+016D:  MOVWF  06
+016E:  BCF    03.5
+016F:  BSF    06.6
+....................       }else{ 
+0170:  GOTO   19E
+....................          if(input_state(d_centena) == 1){ 
+0171:  BTFSS  06.6
+0172:  GOTO   189
+....................             output_low(d_centena); 
+0173:  MOVLW  0F
+0174:  BSF    03.5
+0175:  MOVWF  06
+0176:  BCF    03.5
+0177:  BCF    06.6
+....................             output_d(codigo[milhar]); 
+0178:  MOVLW  2A
+0179:  ADDWF  37,W
+017A:  MOVWF  04
+017B:  BCF    03.7
+017C:  MOVF   00,W
+017D:  MOVWF  3C
+017E:  BSF    03.5
+017F:  CLRF   08
+0180:  BCF    03.5
+0181:  MOVF   3C,W
+0182:  MOVWF  08
+....................             output_high(d_milhar); 
+0183:  MOVLW  0F
+0184:  BSF    03.5
+0185:  MOVWF  06
+0186:  BCF    03.5
+0187:  BSF    06.7
+....................          }else{ 
+0188:  GOTO   19E
+....................                output_low(d_milhar); 
+0189:  MOVLW  0F
+018A:  BSF    03.5
+018B:  MOVWF  06
+018C:  BCF    03.5
+018D:  BCF    06.7
+....................                output_d(codigo[unidade]); 
+018E:  MOVLW  2A
+018F:  ADDWF  34,W
+0190:  MOVWF  04
+0191:  BCF    03.7
+0192:  MOVF   00,W
+0193:  MOVWF  3C
+0194:  BSF    03.5
+0195:  CLRF   08
+0196:  BCF    03.5
+0197:  MOVF   3C,W
+0198:  MOVWF  08
+....................                output_high(d_unidade); 
+0199:  MOVLW  0F
+019A:  BSF    03.5
+019B:  MOVWF  06
+019C:  BCF    03.5
+019D:  BSF    06.4
+....................          } 
+....................       } 
+....................    } 
+....................    return; 
+019E:  BCF    0A.3
+019F:  BCF    0A.4
+01A0:  GOTO   1FA (RETURN)
+.................... } 
+....................  
+
+Configuration Fuses:
+   Word  1: 3FB1   XT NOWDT PUT NOBROWNOUT LVP NOCPD NOWRT NODEBUG NOPROTECT

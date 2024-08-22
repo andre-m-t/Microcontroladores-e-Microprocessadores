@@ -1,0 +1,50 @@
+#include <leituraanalogica.h>
+//constantes
+#define vl_cont1 250    //2ms*250 = 500ms
+#define vl_cont2 10     //500ms*10 = 5000ms -> 5s
+
+//espaco para criacao de variaveis globais
+int1 fim_2ms = 0;
+int1 fim_500ms = 0;
+int1 fim_5s =0;
+int8 cont1 = vl_cont1;
+int8 cont2 = vl_cont2;
+//declaracao de funcoes
+
+
+
+//espaco reservado para interrupcao
+#INT_TIMER0
+void  TIMER0_isr(void) 
+{
+   fim_2ms = 1;
+   cont1--;
+   if(cont1 == 0){
+      cont1 = vl_cont1;
+      fim_500ms = 1;
+      cont2--;
+      if(cont2 == 0){
+         fim_5s = 1;
+      }
+   }   
+   
+}
+
+void main()
+{
+   setup_adc_ports(AN0_AN1_AN3);
+   setup_adc(ADC_CLOCK_INTERNAL);
+   setup_timer_0(RTCC_INTERNAL|RTCC_DIV_8|RTCC_8_BIT);      //2,0 ms overflow
+
+
+   enable_interrupts(INT_TIMER0);
+   enable_interrupts(GLOBAL);
+
+   while(TRUE)
+   {
+
+
+      //TODO: User Code
+   }
+
+}

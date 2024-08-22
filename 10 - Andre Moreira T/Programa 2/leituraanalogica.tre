@@ -1,0 +1,18 @@
+ÀÄleituraanalogica
+   ÃÄMAIN  0/76  Ram=0
+   ³  ÃÄ@cinit1  (Inline)  Ram=0
+   ³  ÃÄleiturasAnalogicas  0/40  Ram=0
+   ³  ÃÄquebrarNumero  0/154  Ram=2
+   ³  ³  ÃÄ@DIV1616  0/37  Ram=5
+   ³  ³  ÃÄ@DIV1616  0/37  Ram=5
+   ³  ³  ÃÄ@goto9014  0/13  Ram=0
+   ³  ³  ÃÄ@DIV1616  0/37  Ram=5
+   ³  ³  ÀÄ@goto9058  0/14  Ram=0
+   ³  ÃÄvarrerDisplay  0/97  Ram=1
+   ³  ÃÄleiturasAnalogicas  0/40  Ram=0
+   ³  ÀÄmostrarDisplay  0/19  Ram=0
+   ³     ÃÄquebrarNumero  0/154  Ram=2
+   ³     ³  ÀÄ*
+   ³     ÀÄquebrarNumero  0/154  Ram=2
+   ³        ÀÄ*
+   ÀÄTIMER0_isr  0/15  Ram=0

@@ -1,0 +1,51 @@
+[PROJECT]
+Target=leituraanalogica.hex
+Processor_Text=PIC16F877A
+CCSVerions=5.076
+Compiler=PCM
+CCSVersion=5.076
+[Target Data]
+FileList=leituraanalogica.c
+[Directories]
+Include=
+[C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\MICRO 2024\Projetos\c\10 - Andre Moreira Tavares\Programa 2\leituraanalogica]
+Type=4
+[mru-list]
+1=leituraanalogica.c
+
+[fileformats]
+forcecoff=0
+
+[ProjectLog]
+Days=1
+D1=30-05-2024
+D1_L=8
+D1_L1=[68566]Project Opened.
+D1_L2=[68620]Started Editing.
+D1_L3=[69475]Stopped Editing.
+D1_L4=[77605]Started Editing.
+D1_L5=[83031]Stopped Editing.
+TotalEdit=95
+TotalDebug=0
+D1_E=95
+D1_D=0
+D1_L6=[83136]Project Closed.
+D1_L7=[83531]Project Opened.
+D1_L8=[83825]Project Closed.
+
+[Opened Files]
+1=leituraanalogica.c
+t1=1
+2=leituraanalogica.h
+t2=7
+Count=3
+3=leituraanalogica.lst
+t3=1
+[leituraanalogica.c]
+Type=4
+
+[defines]
+buildcount=36
+[Units]
+Count=1
+1=leituraanalogica (main)
