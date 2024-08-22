@@ -1,0 +1,73 @@
+#include <ContadorDecimal.h>
+//criacao de variaveis globais
+int8 contador= 100;
+int1 fim_1ms = 0;
+int1 fim_100ms = 0;
+int8 valor = 100;
+char codigo[10] = {0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F}; //código para aparecer nodisplay
+int8 unidade, dezena, centena, milhar;
+//Definicao de funcoes
+void varrerDisplay();
+
+//espaco reservado para interrupcao do tmr0
+#INT_TIMER0
+void  TIMER0_isr(void) 
+{
+   //interrupcao ativa
+   fim_1ms = 1;
+   contador--;
+   if(contador == 0){
+      fim_100ms = 1;     
+      contador = valor;
+   }
+}
+//fim espaco reservado
+
+void main()
+{
+   
+   //setando interrupcao por tmr0 com configuracoes
+   setup_timer_0(RTCC_INTERNAL|RTCC_DIV_8|RTCC_8_BIT);      //1,0 ms overflow
+
+   //ativando interrupcoes
+   enable_interrupts(INT_TIMER0);
+   enable_interrupts(GLOBAL);
+   
+   //inicializando display para varredura
+   output_high(d_unidade);
+   
+   while(TRUE)
+   {
+      if(fim_1ms)
+         varrerDisplay();
+      //TODO: User Code
+   }
+
+}
+
+void varrerDisplay(){
+   if(input_state(d_unidade) == 1){
+      output_d(codigo[unidade]);
+      output_high(d_dezena);
+      output_low(d_unidade);
+      break;
+   }
+   if(input_state(d_dezena) == 1){
+      output_d(codigo[dezena] + 0b1000000);
+      output_high(d_centena);
+      output_low(d_dezena);
+      break;
+   }
+   if(input_state(d_centena) == 1){
+      output_d(codigo[centena]);
+      output_high(d_milhar);
+      output_low(d_centena);
+      break;
+   }
+   if(input_state(d_milhar) == 1){
+      output_d(codigo[milhar]);
+      output_high(d_unidade);
+      output_low(d_milhar);
+      break;
+   }
+}

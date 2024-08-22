@@ -1,0 +1,105 @@
+#include <ContadorDecimal.h>
+//criacao de variaveis globais
+int8 contador= 100;
+int1 fim_1ms = 0;
+int1 fim_100ms = 0;
+int8 valor = 100;
+char codigo[10] = {0b00111111,0b00000110,0b01011011,0b01001111,0b01100110,0b01101101,0b01111101,0b00000111,0b01111111,0b01101111}; //código para aparecer nodisplay
+int8 unidade, dezena, centena, milhar;
+int8 aux;
+int1 parado;
+//Definicao de funcoes
+void varrerDisplay();
+void zerarPress();
+void fazerContagem();
+
+//espaco reservado para interrupcao do tmr0
+#INT_TIMER0
+void  TIMER0_isr(void) 
+{
+   //interrupcao ativa
+   fim_1ms = 1;
+   contador--;
+   if(contador == 0){
+      fim_100ms = 1;     
+      contador = valor;
+   }
+}
+//fim espaco reservado
+
+void main()
+{
+   
+   //setando interrupcao por tmr0 com configuracoes
+   setup_timer_0(RTCC_INTERNAL|RTCC_DIV_8|RTCC_8_BIT);      //1,0 ms overflow
+
+   //ativando interrupcoes
+   enable_interrupts(INT_TIMER0);
+   enable_interrupts(GLOBAL);
+   
+   //inicializando display para varredura
+   output_high(d_unidade);
+   
+   while(TRUE)
+   {
+      if(fim_1ms == 1)
+         varrerDisplay();
+      //TODO: User Code
+      if(input_state(B_S1) == 0) 
+         parado = 0;
+      if(!parado){
+         if(input_state(B_S2)==0){
+            parado = 1;
+         }   
+         fazerContagem();
+         
+      }else{
+         fim_100ms = 0;
+         if(input_state(B_S3) == 0)
+            zerarPress();
+      }
+   }
+
+}
+void fazerContagem(){
+   if(fim_100ms){
+      unidade++;
+      if(unidade > 9)
+         unidade = 0;
+   }
+   
+}
+
+void zerarPress(){
+   unidade = 0;
+   dezena = 0;
+   centena = 0;
+   milhar = 0;
+   fim_100ms = 0;
+}
+
+void varrerDisplay(){
+   fim_1ms = 0;
+   if(input_state(d_unidade) == 1){
+      output_low(d_unidade);
+      output_d(codigo[dezena]+0b10000000);
+      output_high(d_dezena);
+   }else{
+      if(input_state(d_dezena) == 1){
+         output_low(d_dezena);
+         output_d(codigo[centena]);
+         output_high(d_centena);
+      }else{
+         if(input_state(d_centena) == 1){
+            output_low(d_centena);
+            output_d(codigo[milhar]);
+            output_high(d_milhar);
+         }else{
+               output_low(d_milhar);
+               output_d(codigo[unidade]);
+               output_high(d_unidade);
+            
+         }
+      }
+   }
+}

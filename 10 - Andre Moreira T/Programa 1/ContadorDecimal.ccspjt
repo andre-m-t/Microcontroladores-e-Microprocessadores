@@ -1,0 +1,57 @@
+[PROJECT]
+Target=ContadorDecimal.hex
+Processor_Text=PIC16F877A
+CCSVerions=5.076
+Compiler=PCM
+CCSVersion=5.076
+[Target Data]
+FileList=ContadorDecimal.c
+[Directories]
+Include=
+[C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\MICRO 2024\Projetos\c\10 - Andre Moreira Tavares\Contador 0000 a 9999\ContadorDecimal]
+Type=4
+[mru-list]
+1=ContadorDecimal.c
+
+[fileformats]
+forcecoff=0
+
+[ProjectLog]
+Days=1
+D1=30-05-2024
+D1_L=14
+D1_L1=[49911]Project Opened.
+D1_L2=[50032]Started Editing.
+D1_L3=[54452]Stopped Editing.
+D1_L4=[54552]Started Editing.
+D1_L5=[55613]Stopped Editing.
+D1_L6=[55707]Started Editing.
+D1_L7=[58318]Stopped Editing.
+D1_L8=[58427]Started Editing.
+D1_L9=[59561]Stopped Editing.
+D1_L10=[60210]Started Editing.
+D1_L11=[66284]Stopped Editing.
+D1_L12=[66294]Started Editing.
+D1_L13=[66727]Stopped Editing.
+TotalEdit=238
+TotalDebug=0
+D1_E=238
+D1_D=0
+D1_L14=[66727]Project Closed.
+
+[Opened Files]
+1=ContadorDecimal.c
+t1=1
+2=ContadorDecimal.h
+t2=5
+Count=3
+3=ContadorDecimal.lst
+t3=1
+[ContadorDecimal.c]
+Type=4
+
+[defines]
+buildcount=76
+[Units]
+Count=1
+1=ContadorDecimal (main)

@@ -1,0 +1,448 @@
+CCS PCM C Compiler, Version 5.076, 56587               30-mai-24 18:31
+
+               Filename:   C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\MICRO 2024\Projetos\c\10 - Andre Moreira Tavares\Contador 0000 a 9999\ContadorDecimal.lst
+
+               ROM used:   262 words (3%)
+                           Largest free fragment is 2048
+               RAM used:   29 (8%) at main() level
+                           29 (8%) worst case
+               Stack used: 1 locations (0 in main + 1 for interrupts)
+               Stack size: 8
+
+*
+0000:  MOVLW  00
+0001:  MOVWF  0A
+0002:  GOTO   0C4
+0003:  NOP
+0004:  MOVWF  7F
+0005:  SWAPF  03,W
+0006:  CLRF   03
+0007:  MOVWF  21
+0008:  MOVF   0A,W
+0009:  MOVWF  20
+000A:  CLRF   0A
+000B:  MOVF   04,W
+000C:  MOVWF  22
+000D:  MOVF   77,W
+000E:  MOVWF  23
+000F:  MOVF   78,W
+0010:  MOVWF  24
+0011:  MOVF   79,W
+0012:  MOVWF  25
+0013:  MOVF   7A,W
+0014:  MOVWF  26
+0015:  BCF    03.7
+0016:  BCF    03.5
+0017:  BTFSS  0B.5
+0018:  GOTO   01B
+0019:  BTFSC  0B.2
+001A:  GOTO   02C
+001B:  MOVF   22,W
+001C:  MOVWF  04
+001D:  MOVF   23,W
+001E:  MOVWF  77
+001F:  MOVF   24,W
+0020:  MOVWF  78
+0021:  MOVF   25,W
+0022:  MOVWF  79
+0023:  MOVF   26,W
+0024:  MOVWF  7A
+0025:  MOVF   20,W
+0026:  MOVWF  0A
+0027:  SWAPF  21,W
+0028:  MOVWF  03
+0029:  SWAPF  7F,F
+002A:  SWAPF  7F,W
+002B:  RETFIE
+002C:  BCF    0A.3
+002D:  BCF    0A.4
+002E:  GOTO   02F
+.................... #include <ContadorDecimal.h> 
+.................... #include <16F877A.h> 
+.................... //////////// Standard Header file for the PIC16F877A device //////////////// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... ////        (C) Copyright 1996, 2014 Custom Computer Services          //// 
+.................... //// This source code may only be used by licensed users of the CCS C  //// 
+.................... //// compiler.  This source code may only be distributed to other      //// 
+.................... //// licensed users of the CCS C compiler.  No other use, reproduction //// 
+.................... //// or distribution is permitted without written permission.          //// 
+.................... //// Derivative programs created using this software in object code    //// 
+.................... //// form are not restricted in any way.                               //// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... #device PIC16F877A 
+....................  
+.................... #list 
+....................  
+.................... #device ADC=10 
+....................  
+.................... #FUSES PUT                      //Power Up Timer 
+.................... #FUSES NOBROWNOUT               //No brownout reset 
+.................... #FUSES LVP                      //Low Voltage Programming on B3(PIC16) or B5(PIC18) 
+.................... #FUSES NOCPD                    //No EE protection 
+.................... #FUSES NOWRT                    //Program memory not write protected 
+.................... #FUSES NOPROTECT                //Code not protected from reading 
+....................  
+.................... #use delay(crystal=8MHz) 
+.................... #use fixed_io(b_outputs= PIN_B3, PIN_B4, PIN_B5, PIN_B6, PIN_B7) 
+.................... #use fixed_io(d_outputs= PIN_D0, PIN_D1, PIN_D2, PIN_D3, PIN_D4, PIN_D5, PIN_D6, PIN_D7) 
+....................  
+.................... #define B_S1         PIN_B0 
+.................... #define B_S2         PIN_B1 
+.................... #define B_S3         PIN_B2 
+....................  
+.................... #define d_unidade    PIN_B4 
+.................... #define d_dezena     PIN_B5 
+.................... #define d_centena    PIN_B6 
+.................... #define d_milhar     PIN_B7 
+....................  
+.................... #define ponto        PIN_D7 
+....................  
+....................  
+.................... //constantes 
+.................... #define num_cont 100 
+....................  
+.................... //criacao de variaveis globais 
+.................... int8 contador= num_cont; 
+.................... int1 fim_1ms = 0; 
+.................... int1 fim_100ms = 0; 
+.................... char codigo[10] = {0b00111111,0b00000110,0b01011011,0b01001111,0b01100110,0b01101101,0b01111101,0b00000111,0b01111111,0b01101111}; //código para aparecer nodisplay 
+*
+00D4:  MOVLW  3F
+00D5:  BCF    03.5
+00D6:  MOVWF  29
+00D7:  MOVLW  06
+00D8:  MOVWF  2A
+00D9:  MOVLW  5B
+00DA:  MOVWF  2B
+00DB:  MOVLW  4F
+00DC:  MOVWF  2C
+00DD:  MOVLW  66
+00DE:  MOVWF  2D
+00DF:  MOVLW  6D
+00E0:  MOVWF  2E
+00E1:  MOVLW  7D
+00E2:  MOVWF  2F
+00E3:  MOVLW  07
+00E4:  MOVWF  30
+00E5:  MOVLW  7F
+00E6:  MOVWF  31
+00E7:  MOVLW  6F
+00E8:  MOVWF  32
+.................... int8 unidade, dezena, centena, milhar; 
+.................... int1 parado = 1; 
+....................  
+.................... //Definicao de funcoes 
+.................... void varrerDisplay(); 
+.................... void zerarPress(); 
+.................... void fazerContagem(); 
+....................  
+.................... //espaco reservado para interrupcao do tmr0 
+.................... #INT_TIMER0 
+.................... void  TIMER0_isr(void)  
+.................... { 
+....................    //interrupcao ativa 
+....................    fim_1ms = 1; 
+*
+002F:  BSF    28.0
+....................    contador--; 
+0030:  DECFSZ 27,F
+....................    if(contador == 0){ 
+0031:  GOTO   035
+....................       fim_100ms = 1; 
+0032:  BSF    28.1
+....................       contador = num_cont; 
+0033:  MOVLW  64
+0034:  MOVWF  27
+....................    } 
+0035:  BCF    0B.2
+0036:  BCF    0A.3
+0037:  BCF    0A.4
+0038:  GOTO   01B
+.................... } 
+.................... //fim espaco reservado 
+....................  
+.................... void main() 
+*
+00C4:  MOVF   03,W
+00C5:  ANDLW  1F
+00C6:  MOVWF  03
+00C7:  MOVLW  64
+00C8:  MOVWF  27
+00C9:  BCF    28.0
+00CA:  BCF    28.1
+00CB:  BSF    28.2
+00CC:  BSF    03.5
+00CD:  BSF    1F.0
+00CE:  BSF    1F.1
+00CF:  BSF    1F.2
+00D0:  BCF    1F.3
+00D1:  MOVLW  07
+00D2:  MOVWF  1C
+00D3:  BCF    03.7
+.................... { 
+....................     
+....................    //setando interrupcao por tmr0 com configuracoes 
+....................    setup_timer_0(RTCC_INTERNAL|RTCC_DIV_8|RTCC_8_BIT);      //1,0 ms overflow 
+*
+00E9:  BSF    03.5
+00EA:  MOVF   01,W
+00EB:  ANDLW  C0
+00EC:  IORLW  02
+00ED:  MOVWF  01
+....................  
+....................    //ativando interrupcoes 
+....................    enable_interrupts(INT_TIMER0); 
+00EE:  BCF    03.5
+00EF:  BSF    0B.5
+....................    enable_interrupts(GLOBAL); 
+00F0:  MOVLW  C0
+00F1:  IORWF  0B,F
+....................     
+....................    //inicializando display para varredura 
+....................    output_high(d_unidade); 
+00F2:  MOVLW  07
+00F3:  BSF    03.5
+00F4:  MOVWF  06
+00F5:  BCF    03.5
+00F6:  BSF    06.4
+....................     
+....................    //laco principal    
+....................    while(TRUE) 
+....................    { 
+....................       if(fim_1ms == 1) 
+00F7:  BTFSC  28.0
+....................          varrerDisplay(); 
+00F8:  GOTO   039
+....................       //TODO: User Code 
+....................       if(input_state(B_S1) == 0)  
+00F9:  BTFSS  06.0
+....................          parado = 0; 
+00FA:  BCF    28.2
+....................       if(!parado){ 
+00FB:  BTFSC  28.2
+00FC:  GOTO   101
+....................          if(input_state(B_S2)==0){ 
+00FD:  BTFSS  06.1
+....................             parado = 1; 
+00FE:  BSF    28.2
+....................          }    
+....................          fazerContagem(); 
+00FF:  GOTO   09B
+....................           
+....................       }else{ 
+0100:  GOTO   104
+....................          fim_100ms = 0; 
+0101:  BCF    28.1
+....................          if(input_state(B_S3) == 0) 
+0102:  BTFSS  06.2
+....................             zerarPress(); 
+0103:  GOTO   0BC
+....................       } 
+0104:  GOTO   0F7
+....................    } 
+....................  
+.................... } 
+.................... void fazerContagem(){ 
+0105:  SLEEP
+....................    if(fim_100ms){ 
+*
+009B:  BTFSS  28.1
+009C:  GOTO   0B9
+....................       fim_100ms = 0; 
+009D:  BCF    28.1
+....................       unidade++; 
+009E:  INCF   33,F
+....................       if(unidade > 9){ 
+009F:  MOVF   33,W
+00A0:  SUBLW  09
+00A1:  BTFSC  03.0
+00A2:  GOTO   0B9
+....................          unidade = 0; 
+00A3:  CLRF   33
+....................          dezena++; 
+00A4:  INCF   34,F
+....................          if(dezena > 9){ 
+00A5:  MOVF   34,W
+00A6:  SUBLW  09
+00A7:  BTFSC  03.0
+00A8:  GOTO   0B9
+....................             dezena = 0; 
+00A9:  CLRF   34
+....................             centena++; 
+00AA:  INCF   35,F
+....................             if(centena>9){ 
+00AB:  MOVF   35,W
+00AC:  SUBLW  09
+00AD:  BTFSC  03.0
+00AE:  GOTO   0B9
+....................                centena = 0; 
+00AF:  CLRF   35
+....................                milhar++; 
+00B0:  INCF   36,F
+....................                if(milhar>9){ 
+00B1:  MOVF   36,W
+00B2:  SUBLW  09
+00B3:  BTFSC  03.0
+00B4:  GOTO   0B9
+....................                   milhar=0; 
+00B5:  CLRF   36
+....................                   centena=0; 
+00B6:  CLRF   35
+....................                   dezena=0; 
+00B7:  CLRF   34
+....................                   unidade=0; 
+00B8:  CLRF   33
+....................                }    
+....................             } 
+....................          } 
+....................       }    
+....................    } 
+00B9:  BCF    0A.3
+00BA:  BCF    0A.4
+00BB:  GOTO   100 (RETURN)
+....................     
+.................... } 
+....................  
+.................... void zerarPress(){ 
+....................    unidade = 0; 
+00BC:  CLRF   33
+....................    dezena = 0; 
+00BD:  CLRF   34
+....................    centena = 0; 
+00BE:  CLRF   35
+....................    milhar = 0; 
+00BF:  CLRF   36
+....................    fim_100ms = 0; 
+00C0:  BCF    28.1
+00C1:  BCF    0A.3
+00C2:  BCF    0A.4
+00C3:  GOTO   104 (RETURN)
+.................... } 
+....................  
+.................... void varrerDisplay(){ 
+....................    fim_1ms = 0; 
+*
+0039:  BCF    28.0
+....................    if(input_state(d_unidade) == 1){ 
+003A:  BTFSS  06.4
+003B:  GOTO   053
+....................       output_low(d_unidade); 
+003C:  MOVLW  07
+003D:  BSF    03.5
+003E:  MOVWF  06
+003F:  BCF    03.5
+0040:  BCF    06.4
+....................       output_d(codigo[dezena]+0b10000000); 
+0041:  MOVLW  29
+0042:  ADDWF  34,W
+0043:  MOVWF  04
+0044:  BCF    03.7
+0045:  MOVLW  80
+0046:  ADDWF  00,W
+0047:  MOVWF  37
+0048:  BSF    03.5
+0049:  CLRF   08
+004A:  BCF    03.5
+004B:  MOVF   37,W
+004C:  MOVWF  08
+....................       output_high(d_dezena); 
+004D:  MOVLW  07
+004E:  BSF    03.5
+004F:  MOVWF  06
+0050:  BCF    03.5
+0051:  BSF    06.5
+....................    }else{ 
+0052:  GOTO   098
+....................       if(input_state(d_dezena) == 1){ 
+0053:  BTFSS  06.5
+0054:  GOTO   06B
+....................          output_low(d_dezena); 
+0055:  MOVLW  07
+0056:  BSF    03.5
+0057:  MOVWF  06
+0058:  BCF    03.5
+0059:  BCF    06.5
+....................          output_d(codigo[centena]); 
+005A:  MOVLW  29
+005B:  ADDWF  35,W
+005C:  MOVWF  04
+005D:  BCF    03.7
+005E:  MOVF   00,W
+005F:  MOVWF  37
+0060:  BSF    03.5
+0061:  CLRF   08
+0062:  BCF    03.5
+0063:  MOVF   37,W
+0064:  MOVWF  08
+....................          output_high(d_centena); 
+0065:  MOVLW  07
+0066:  BSF    03.5
+0067:  MOVWF  06
+0068:  BCF    03.5
+0069:  BSF    06.6
+....................       }else{ 
+006A:  GOTO   098
+....................          if(input_state(d_centena) == 1){ 
+006B:  BTFSS  06.6
+006C:  GOTO   083
+....................             output_low(d_centena); 
+006D:  MOVLW  07
+006E:  BSF    03.5
+006F:  MOVWF  06
+0070:  BCF    03.5
+0071:  BCF    06.6
+....................             output_d(codigo[milhar]); 
+0072:  MOVLW  29
+0073:  ADDWF  36,W
+0074:  MOVWF  04
+0075:  BCF    03.7
+0076:  MOVF   00,W
+0077:  MOVWF  37
+0078:  BSF    03.5
+0079:  CLRF   08
+007A:  BCF    03.5
+007B:  MOVF   37,W
+007C:  MOVWF  08
+....................             output_high(d_milhar); 
+007D:  MOVLW  07
+007E:  BSF    03.5
+007F:  MOVWF  06
+0080:  BCF    03.5
+0081:  BSF    06.7
+....................          }else{ 
+0082:  GOTO   098
+....................                output_low(d_milhar); 
+0083:  MOVLW  07
+0084:  BSF    03.5
+0085:  MOVWF  06
+0086:  BCF    03.5
+0087:  BCF    06.7
+....................                output_d(codigo[unidade]); 
+0088:  MOVLW  29
+0089:  ADDWF  33,W
+008A:  MOVWF  04
+008B:  BCF    03.7
+008C:  MOVF   00,W
+008D:  MOVWF  37
+008E:  BSF    03.5
+008F:  CLRF   08
+0090:  BCF    03.5
+0091:  MOVF   37,W
+0092:  MOVWF  08
+....................                output_high(d_unidade); 
+0093:  MOVLW  07
+0094:  BSF    03.5
+0095:  MOVWF  06
+0096:  BCF    03.5
+0097:  BSF    06.4
+....................              
+....................          } 
+....................       } 
+....................    } 
+0098:  BCF    0A.3
+0099:  BCF    0A.4
+009A:  GOTO   0F9 (RETURN)
+.................... } 
+
+Configuration Fuses:
+   Word  1: 3FB2   HS NOWDT PUT NOBROWNOUT LVP NOCPD NOWRT NODEBUG NOPROTECT

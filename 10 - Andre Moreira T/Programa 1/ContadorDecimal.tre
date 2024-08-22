@@ -1,0 +1,7 @@
+ÀÄContadorDecimal
+   ÃÄMAIN  0/66  Ram=1
+   ³  ÃÄ@cinit1  (Inline)  Ram=0
+   ³  ÃÄvarrerDisplay  0/98  Ram=1
+   ³  ÃÄfazerContagem  0/33  Ram=0
+   ³  ÀÄzerarPress  0/8  Ram=0
+   ÀÄTIMER0_isr  0/10  Ram=0
