@@ -1,0 +1,276 @@
+#include <ControleTemperatura_Modelo2.h>
+#include <lcd_8bits.c>
+//constantes
+#define canal_temp 0
+#define canal_pot  1
+
+
+//variaveis globais
+int1 fim_tempo = 0;
+int8 contador;  //2ms*125 = 250ms
+int1 processo = 0;
+int1 ligar_fan = 0;
+float histerese = 10;
+int16 potenciometro, temperatura;
+int16 pot_c, temp_c;
+int1  acao, acao2, acao3, acao4, qual_tela;
+int8  filtro, filtro2, filtro3, filtro4;
+
+#define  V_FILTRO    30
+#define  V_CONT  30
+//declaracao de funcoes
+void leiturasAnalogicas();
+void primeiraTela();
+void segundaTela();
+
+//espaco reservado para interrupcao
+
+#INT_TIMER0
+void  TIMER0_isr(void) 
+{
+   contador--;
+   if(contador == 0){
+      fim_tempo = 1;
+      contador = V_CONT;
+      
+   }   
+
+}
+
+void main()
+{
+   setup_adc_ports(AN0_AN1_AN3);
+   setup_adc(ADC_CLOCK_INTERNAL);
+   setup_timer_0(RTCC_INTERNAL|RTCC_DIV_16|RTCC_8_BIT);      //2,0 ms overflow
+   acao = acao2 =  acao3 = acao4 = 0;
+   qual_tela = 0;
+   contador = V_CONT;
+
+   enable_interrupts(INT_TIMER0);
+   enable_interrupts(GLOBAL);
+
+   //LCD
+   lcd_init();
+   primeiraTela();
+
+
+   while(TRUE)
+   {
+      //LEITURA ANALOGICA E ATT TELA
+      if(fim_tempo){
+            leiturasAnalogicas();
+            if(qual_tela)
+               segundaTela();
+            else
+               primeiraTela();
+      }      
+      //VERIFICA BOTAO ONOFF
+      if(input(B_LIGA_DESL) == 0)
+      {
+         if(acao == 0)
+         {
+            filtro--;
+            if (filtro == 0)
+            {
+               acao = 1;
+               if(!processo)
+                  processo = 1;
+               else{
+                  processo = 0;
+                  ligar_fan = 0;
+                  output_low(HEATER);
+                  output_low(FAN);
+               }
+               
+            }
+         }
+      }else{
+         acao = 0;
+         filtro = V_FILTRO;
+      }
+      //incrementa histerese
+      if(input(B_INC_HIST) == 0){
+         if(acao2 == 0)
+         {
+            filtro2--;
+            if (filtro2 == 0)
+            {
+               acao2 = 1;
+               if(histerese < 9.9)
+                  histerese = histerese + 0.1;   
+            }
+         }
+
+      }else{
+         acao2 = 0;
+         filtro2 = V_FILTRO;
+      }
+      //decrementa histerese
+      if(input(B_DEC_HIST) == 0){
+         if(acao3 == 0)
+         {
+            filtro3--;
+            if (filtro3 == 0)
+            {
+               acao3 = 1;
+               if(histerese > 0.1)
+                  histerese = histerese - 0.1;    
+            }
+         }
+
+      }else{
+         acao3 = 0;
+         filtro3 = V_FILTRO;
+      }
+      //troca tela 
+      if(input(B_TROCA_INFO) == 0){
+         if(acao4 == 0)
+         {
+            filtro4--;
+            if (filtro4 == 0)
+            {
+               acao4 = 1;
+               //verificando qual tela está mostrando
+               if(qual_tela){
+                  //tela 1
+                  lcd_init();
+                  qual_tela = 0;
+               }else{
+                  //tela 2
+                  lcd_init();
+                  qual_tela = 1;
+               }
+            }
+         }
+
+      }else{
+         acao4 = 0;
+         filtro4 = V_FILTRO;
+      }
+       
+      //inicio do processo
+      if(processo){
+         if(!qual_tela){
+            lcd_gotoxy(15,2);
+            printf(lcd_write_dat,"On");//processo
+         }
+         //temperatura menor que a setada
+         if((temperatura+histerese) < potenciometro){
+            output_high(HEATER);
+            if(!qual_tela){
+               lcd_gotoxy(12,2);
+               printf(lcd_write_dat,"On");//heater
+            }
+         }
+         //temperatura maior que a setada   
+         if((temperatura-histerese) > potenciometro){
+            output_low(HEATER);
+            if(!qual_tela){
+               lcd_gotoxy(12,2);
+               printf(lcd_write_dat,"Of");//heater
+            }
+         }
+         if(ligar_fan){
+            output_high(FAN);
+            if(!qual_tela){
+               lcd_gotoxy(12,1);
+               printf(lcd_write_dat,"On");//fan
+            }
+            if(temperatura <= potenciometro)
+               ligar_fan = 0;
+         }
+         else{
+            output_low(FAN);
+            if(!qual_tela){
+               lcd_gotoxy(12,1);
+               printf(lcd_write_dat,"Of");//fan
+            }   
+             
+         }
+         //condicao para ligar o fan    
+         if((temperatura-20) > potenciometro)
+            ligar_fan = 1;
+         
+      }else{
+         if(!qual_tela){
+            lcd_gotoxy(15,2);
+            printf(lcd_write_dat,"Of");//processo
+            lcd_gotoxy(12,1);
+            printf(lcd_write_dat,"Of");//fan
+            lcd_gotoxy(12,2);
+            printf(lcd_write_dat,"Of");//heater
+         }   
+           
+      }
+   }
+
+
+      //TODO: User Code
+}
+
+void primeiraTela(){
+   //primeira tela
+   lcd_gotoxy(1,1);
+   printf(lcd_write_dat,"Sp:");//setpoint
+   lcd_gotoxy(1,2);
+   printf(lcd_write_dat,"Tp:");//temperatura
+   lcd_gotoxy(9,1);
+   printf(lcd_write_dat,"Fn:");//fan
+   lcd_gotoxy(9,2);
+   printf(lcd_write_dat,"Ht:");//heater
+   lcd_gotoxy(15,2);
+   printf(lcd_write_dat,"Of");//processo
+   lcd_gotoxy(12,1);
+   printf(lcd_write_dat,"Of");//fan
+   lcd_gotoxy(12,2);
+   printf(lcd_write_dat,"Of");//heater
+   
+   //valores
+   lcd_gotoxy(4,2);
+   printf(lcd_write_dat,"%4lu",temperatura);//setpoint
+   lcd_gotoxy(4,1);
+   printf(lcd_write_dat,"%4lu",potenciometro);//setpoint
+
+}
+
+void segundaTela(){
+   //primeira tela
+   printf(lcd_write_dat,"");//setpoint
+   lcd_gotoxy(1,2);
+   printf(lcd_write_dat,"");//temperatura
+   lcd_gotoxy(9,1);
+   printf(lcd_write_dat,"");//fan
+   lcd_gotoxy(9,2);
+   printf(lcd_write_dat,"");//heater
+   lcd_gotoxy(15,2);
+   printf(lcd_write_dat,"");//processo
+   lcd_gotoxy(12,1);
+   printf(lcd_write_dat,"");//fan
+   lcd_gotoxy(12,2);
+   printf(lcd_write_dat,"");//heater
+   
+   //valores
+   lcd_gotoxy(4,2);
+   printf(lcd_write_dat,"%4lu",temp_c);//setpoint
+   lcd_gotoxy(4,1);
+   printf(lcd_write_dat,"%4lu",pot_c);//setpoint
+}
+
+
+void leiturasAnalogicas(){
+   fim_tempo = 0;
+   //adc temperatura
+   set_adc_channel(canal_temp);
+   delay_us(40);
+   temperatura = read_adc();
+   //transformando temp_sensor em celcius
+   temp_c =  0.12 * temperatura - 12.52;
+   //adc potenciometro
+   set_adc_channel(canal_pot);
+   delay_us(40);
+   potenciometro = read_adc();
+   //transformando tempo_pot em celcius
+   pot_c =  0.12 * potenciometro - 12.52;
+   return;
+}
+

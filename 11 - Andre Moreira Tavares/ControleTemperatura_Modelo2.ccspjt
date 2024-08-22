@@ -1,0 +1,65 @@
+[PROJECT]
+Target=ControleTemperatura_Modelo2.hex
+Processor_Text=PIC16F877A
+CCSVerions=5.076
+Compiler=PCM
+CCSVersion=5.076
+[Target Data]
+FileList=ControleTemperatura_Modelo2.c
+[Directories]
+Include=
+[C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\MICRO 2024\Projetos\c\11 - Andre Moreira Tavares\ControleTemperatura_Modelo2]
+Type=4
+[mru-list]
+1=ControleTemperatura_Modelo2.c
+
+[fileformats]
+forcecoff=0
+
+[ProjectLog]
+Days=3
+D1=16-06-2024
+D1_L=6
+D1_L1=[80414]Project Opened.
+D1_L2=[80563]Started Editing.
+D1_L3=[81620]Stopped Editing.
+D1_L4=[81731]Started Editing.
+D1_L5=[85945]Stopped Editing.
+TotalEdit=150
+TotalDebug=0
+D1_E=83
+D1_D=0
+D1_L6=[85945]Project Closed.
+D2=21-06-2024
+D2_L=10
+D2_L1=[58132]Project Opened.
+D2_L2=[58388]Started Editing.
+D2_L3=[60368]Stopped Editing.
+D2_L4=[60604]Started Editing.
+D2_L5=[61627]Stopped Editing.
+D2_E=67
+D2_D=0
+D2_L6=[61627]Project Closed.
+D2_L7=[71023]Project Opened.
+D2_L8=[71144]Started Editing.
+D2_L9=[72345]Stopped Editing.
+D2_L10=[72345]Project Closed.
+D3=03-07-2024
+D3_L=2
+D3_L1=[34040]Project Opened.
+D3_L2=[34353]Project Closed.
+
+[Opened Files]
+1=ControleTemperatura_Modelo2.c
+t1=1
+2=ControleTemperatura_Modelo2.h
+t2=2
+Count=2
+[ControleTemperatura_Modelo2.c]
+Type=4
+
+[defines]
+buildcount=55
+[Units]
+Count=1
+1=ControleTemperatura_Modelo2 (main)
