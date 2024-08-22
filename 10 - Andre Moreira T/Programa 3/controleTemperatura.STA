@@ -1,0 +1,59 @@
+
+ROM used:   730/8192 (9%)
+            730/8192 (9%) including unused fragments
+
+            0.8 Average locations per line
+            5.4 Average locations per statement
+
+RAM used:   22/368 (6%) at main() level
+            32/368 (9%) worst case
+
+Stack used: 4 worst case (3 in main + 1 for interrupts)
+Stack size: 8
+
+Lines Stmts  %   Files
+----- ----- ---  -----
+  132    82  61  controleTemperatura.c
+   20     0   0  controleTemperatura.h
+  684     0   0  D:\Program Files (x86)\PICC\Devices\16F877A.h
+  127    53  39  lcd_8bits.c
+----- -----
+  963   135 Total
+
+Page ROM  %  RAM    Vol Diff  Functions:
+---- --- --- ---    --- ----  ----------
+0     20   3    1             @delay_ms1
+0     51   7    2    294  4.3  output
+0     32   4    1    154  1.8  lcd_write_cmd
+0     32   4    1    154  1.8  lcd_write_dat
+0     31   4    0    179  1.4  lcd_init
+0     16   2    4    200  5.5  lcd_gotoxy
+0      9   1    0     82  2.8  TIMER0_isr
+0    325  45    2   2312  7.3  MAIN
+0     68   9    0    323  2.7  leiturasAnalogicas
+0     99  14    9             @PRINTF_LU_642
+ Inline         0             @cinit1
+
+Program metrics:
+    Functions               8
+    Statements              135
+    Comments                196
+    Volume (V)              5107
+    Difficulty (D)          27.7
+    Effort to implement (E) 141370
+    Time to implement (T)   2 hours, 11 minutes
+    Est Delivered Bugs (B)  1
+    Cyclomatic Complexity   17
+    Maintainability (MI)    140
+
+ Segment     Used  Free
+-----------  ----  ----
+00000-00003     4  0  
+00004-0002E    43  0  
+0002F-007FF   683  1318  
+00800-00FFF     0  2048  
+01000-017FF     0  2048  
+01800-01FFF     0  2048  
+
+
+

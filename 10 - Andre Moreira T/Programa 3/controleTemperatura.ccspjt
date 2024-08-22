@@ -1,0 +1,55 @@
+[PROJECT]
+Target=controleTemperatura.hex
+Processor_Text=PIC16F877A
+CCSVerions=5.076
+Compiler=PCM
+CCSVersion=5.076
+[Target Data]
+FileList=controleTemperatura.c
+[Directories]
+Include=
+[C:\Users\André\Desktop\Engenharia\6 Período\Microprocessadores e Microcontroladores\MICRO 2024\Projetos\c\10 - Andre Moreira Tavares\Programa 3\controleTemperatura]
+Type=4
+[mru-list]
+1=controleTemperatura.c
+
+[fileformats]
+forcecoff=0
+
+[ProjectLog]
+Days=3
+D1=30-05-2024
+D1_L=2
+D1_L1=[83826]Project Opened.
+D1_L2=[83918]Started Editing.
+D2=31-05-2024
+D2_L=6
+D2_L1=[1361]Stopped Editing.
+TotalEdit=69
+TotalDebug=0
+D2_E=69
+D2_D=0
+D2_L2=[1361]Project Closed.
+D2_L3=[83479]Project Opened.
+D2_L4=[83524]Started Editing.
+D2_L5=[83750]Stopped Editing.
+D2_L6=[83750]Project Closed.
+D3=12-06-2024
+D3_L=2
+D3_L1=[33212]Project Opened.
+D3_L2=[33511]Project Closed.
+
+[Opened Files]
+1=controleTemperatura.c
+t1=58
+2=controleTemperatura.h
+t2=1
+Count=2
+[controleTemperatura.c]
+Type=4
+
+[defines]
+buildcount=34
+[Units]
+Count=1
+1=controleTemperatura (main)

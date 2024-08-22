@@ -1,0 +1,78 @@
+#include <controleTemperatura.h>
+#include <lcd_8bits.c>
+//constantes
+#define canal_temp 0
+#define canal_pot  1
+
+
+//variaveis globais
+int1 fim_tempo = 0;
+int8 contador = 250;  //1ms*250 = 250ms
+int1 processo = 0;
+int16 potenciometro, temperatura;
+//declaracao de funcoes
+void leiturasAnalogicas();
+
+
+//espaco reservado para interrupcao
+#INT_TIMER0
+void  TIMER0_isr(void) 
+{
+   contador--;
+   if(contador == 0){
+      fim_tempo = 1;
+      contador = 250;
+   }   
+}
+//fim espaco reservado
+
+void main()
+{
+   //ENTRADAS ANALOGICAS
+   setup_adc_ports(AN0_AN1_AN3);
+   setup_adc(ADC_CLOCK_INTERNAL);
+   setup_timer_0(RTCC_INTERNAL|RTCC_DIV_8|RTCC_8_BIT);      //1,0 ms overflow
+
+   //INTERRUPCAO
+   enable_interrupts(INT_TIMER0);
+   enable_interrupts(GLOBAL);
+   
+   //LCD
+   lcd_init();
+   printf(lcd_write_dat,"Sp:");//setpoint
+   lcd_gotoxy(1,2);
+   printf(lcd_write_dat,"Tp:");//temperatura
+   lcd_gotoxy(9,1);
+   printf(lcd_write_dat,"Fn:");//fan
+   lcd_gotoxy(9,2);
+   printf(lcd_write_dat,"Ht:");//heater
+   lcd_gotoxy(15,2);
+   printf(lcd_write_dat,"Of");//processo
+   
+
+
+   while(TRUE)
+   {
+      if(fim_tempo)
+         leiturasAnalogicas();
+
+      //TODO: User Code
+   }
+
+}
+
+void leiturasAnalogicas(){
+   fim_tempo = 0;
+   //adc temperatura
+   set_adc_channel(canal_temp);
+   delay_us(40);
+   temperatura = read_adc();
+   //adc potenciometro
+   set_adc_channel(canal_pot);
+   delay_us(40);
+   potenciometro = read_adc();
+   lcd_gotoxy(4,1);
+   printf(lcd_write_dat,"Sp:");//setpoint
+   return;
+}
+

@@ -1,0 +1,51 @@
+#include <controleTemperatura.h>
+#include <lcd_8bits.c>
+//variaveis globais
+int1 fim_tempo = 0;
+int8 contador = 250;  //1ms*250 = 250ms
+
+//declaracao de funcoes
+
+
+//espaco reservado para interrupcao
+#INT_TIMER0
+void  TIMER0_isr(void) 
+{
+   contador--;
+   if(contador == 0){
+      fim_tempo = 1;
+      contador = 250;
+   }   
+}
+//fim espaco reservado
+
+void main()
+{
+   //ENTRADAS ANALOGICAS
+   setup_adc_ports(AN0_AN1_AN3);
+   setup_adc(ADC_CLOCK_INTERNAL);
+   setup_timer_0(RTCC_INTERNAL|RTCC_DIV_8|RTCC_8_BIT);      //1,0 ms overflow
+
+   //INTERRUPCAO
+   enable_interrupts(INT_TIMER0);
+   enable_interrupts(GLOBAL);
+   
+   //LCD
+   lcd_init();
+   printf(lcd_write_dat,"Sp:");//setpoint
+   lcd_gotoxy(1,2);
+   printf(lcd_write_dat,"Tp:");//temperatura
+   lcd_gotoxy(9,1);
+   printf(lcd_write_dat,"Fan:");
+   lcd_gotoxy(9,2);
+   printf(lcd_write_dat,"Hea:");
+
+
+   while(TRUE)
+   {
+
+
+      //TODO: User Code
+   }
+
+}
